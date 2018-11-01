@@ -10,23 +10,26 @@ MySQL Database. Examples.
   * Post-migration
   * Code (APIs)
 * mysql/compare - configurable shell scripts to **compare** Source and Target Databases
-* mysql/account - example of the **account schema** creation
-  * naming convention
-  * formatted SQL statements
+* mysql/account - example of the **"account" schema** creation
+  * Naming convention
+  * Formatted SQL statements
   * PK and FK constraints
-  * default values
-  * log tables
-  * triggers
-  * procedures
+  * Default values
+  * Log tables
+  * Triggers
+  * Procedures
 * mysql/elt - Extract-Load-Transform (**ELT**) schemas
-  * release scripts
-  * procedures
-  * migration
-  * logs
+  * Release scripts
+  * Procedures
+  * Migration
+  * Dynamic SQL
+  * FEDERATED tables
+  * Sharding
+  * Logs
   * SQL and bat scripts to manage schemas 
 * mysql/reports - examples of complex **report** statements
   * SQL scripts
-* mysql/store - example of "store" schema
-  * sharding
-  * shell scripts to run reports
+* mysql/store - examples from the **"store" schema**
+  * Sharding
+  * Shell scripts to run reports
   * SQL scripts
