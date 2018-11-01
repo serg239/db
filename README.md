@@ -1,4 +1,4 @@
-# SQL and Shell scripts I designed to manage different types of Databases
+# SQL and Shell scripts to create and manage a different types of Databases
 
 * Database management in [mysql](https://github.com/serg239/db/tree/master/mysql/) Database
 * Distributed tables in [greenPlum](greenplum/README.md) Database
