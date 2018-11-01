@@ -94,7 +94,7 @@ db1_schemas="${db1_dbSchemas}"
 db2_schemas="${db2_dbSchemas}"
 
 # -------------------------------------
-# Tables in OMS database
+# Tables in DB1 database
 # -------------------------------------
 for schema in ${db1_schemas[@]}; do
 
@@ -134,7 +134,7 @@ for schema in ${db1_schemas[@]}; do
 done
 
 # -------------------------------------
-# Tables in CATALOG database
+# Tables in DB2 database
 # -------------------------------------
 for schema in ${db2_schemas[@]}; do
 
@@ -175,7 +175,7 @@ for schema in ${db2_schemas[@]}; do
 done
 
 # -------------------------------------
-# Columns in OMS database
+# Columns in DB1 database
 # -------------------------------------
 for schema in ${db1_schemas[@]}; do
 
@@ -257,7 +257,7 @@ for schema in ${db1_schemas[@]}; do
 done
 
 # -------------------------------------
-# Columns in CATALOG database
+# Columns in DB2 database
 # -------------------------------------
 for schema in ${db2_schemas[@]}; do
 
