@@ -5,3 +5,4 @@
 * Flow Data Records [postgres](postgres/README.md) Database
 * Use Cases for [cassandra](cassandra/README.md) Database
 * Configuration of [mongoDB](mongoDB/README.md) Database
+* Applications to work with [oracle] (oracle/README.md) database
