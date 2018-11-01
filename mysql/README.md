@@ -18,6 +18,11 @@ MySQL Database. Examples.
   * Log tables
   * Triggers
   * Procedures
+* mysql/tools - examples of metadata management
+  * check and alter table
+  * check if change applied
+  * clean DDL
+  * create table partitions
 * mysql/elt - Extract-Load-Transform (**ELT**) schemas
   * Release scripts
   * Procedures
@@ -36,9 +41,4 @@ MySQL Database. Examples.
 * mysql/proc - creators, getters, and setters for "account" schema
   * check if account exists
   * create/delete/update/get account
-  * get shards by using account id
-* mysql/tools - examples of metadata management
-  * check and alter table
-  * check if change applied
-  * clean DDL
-  * create table partitions
+  * get shards by using account
