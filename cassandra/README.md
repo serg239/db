@@ -1,2 +1,2 @@
-Examples of cassandra DB database management
---------------------------------------------
+Examples of cassandra database management
+-----------------------------------------
