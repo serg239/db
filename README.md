@@ -4,4 +4,4 @@
 * Distributed tables in [greenPlum](greenplum/README.md) Database
 * Flow Data Records [postgres](postgres/README.md) Database
 * Use Cases for [cassandra](cassandra/README.md) Database
-* Configuration [mongoDB](mongoDB/README.md) Database
+* Configuration of [mongoDB](mongoDB/README.md) Database
