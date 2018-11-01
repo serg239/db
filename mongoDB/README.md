@@ -1,2 +1,2 @@
-Examples of mongoDB database management
----------------------------------------
+Examples of mongoDB management
+------------------------------
