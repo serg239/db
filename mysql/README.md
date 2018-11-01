@@ -12,10 +12,12 @@ MySQL Database. Examples.
 * mysql/compare - shell scripts to compare Source and Target Databases
 * mysql/account - example of the account schema:
   * naming convention
-  * formatting SQL statements
+  * formatted SQL statements
+  * PK and FK constraints
+  * default values
   * log tables
-  * procedures
   * triggers
+  * procedures
 * mysql/elt - Extract-Load-Transform schemas example 
   * release_scripts
   * procedures
