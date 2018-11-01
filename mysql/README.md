@@ -23,6 +23,7 @@ MySQL Database. Examples.
   * check if change applied
   * clean DDL
   * create table partitions
+  * recreate FEDERATED tables
 * mysql/elt - Extract-Load-Transform (**ELT**) schemas
   * Release scripts
   * Procedures
