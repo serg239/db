@@ -29,7 +29,7 @@ cat /dev/null > "$tmp_dir/TW_item_publish.csv"
 # usage, this is not printed as of now :)
 
 function usage() {
-cat >& 2 << __USAGE__
+cat >& 2 << __USAGE__
 ${prog_name}: Usage: ${prog_name} Reporting Date [optional, yyyy-mm-dd]
 __USAGE__
 
