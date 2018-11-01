@@ -33,3 +33,12 @@ MySQL Database. Examples.
   * Sharding
   * Shell scripts to run reports
   * SQL scripts
+* mysql/proc - creators, getters, and setters for "account" schema
+  * check if account exists
+  * create/delete/update/get account
+  * get shards by using account id
+* mysql/tools - examples of metadata management
+  * check and alter table
+  * check if change applied
+  * clean DDL
+  * create table partitions
