@@ -9,7 +9,7 @@ MySQL Database. Examples.
   * Migration
   * Post-migration
   * Code (APIs)
-* mysql/compare - shell scripts to compare Source and Target Databases
+* mysql/compare - configurable shell scripts to compare Source and Target Databases
 * mysql/account - example of the account schema:
   * naming convention
   * formatted SQL statements
