@@ -1,5 +1,5 @@
-Examples of table's creation in GreenPlum DB
---------------------------------------------
+Examples of schema and table's creation in GreenPlum DB
+-------------------------------------------------------
 
 * Distribution Keys
 * Check constraints
