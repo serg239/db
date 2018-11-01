@@ -1,0 +1,100 @@
+Directory of c:\SVN_SellPo\trunk\db\schemas\account\procs
+-------------------------------------------------------------------
+09/10/2010  19:58               938 add_account_ba.sql
+09/10/2010  19:58               930 add_account_cc.sql
+09/10/2010  19:58             1,507 add_account_user.sql
+-------------------------------------------------------------------
+09/10/2010  19:58             1,226 ban_unban_account.sql
+-------------------------------------------------------------------
+09/10/2010  19:58               429 check_if_account_exists.sql
+09/10/2010  19:58               551 check_if_store_exists.sql
+-------------------------------------------------------------------
+09/10/2010  19:58             3,573 create_account.sql
+09/10/2010  19:58             3,343 create_account_address.sql
+09/10/2010  19:58             1,910 create_account_contact.sql
+09/10/2010  19:58             1,488 create_account_message.sql
+09/10/2010  19:58             1,076 create_account_notification.sql
+09/10/2010  19:58             1,314 create_account_rule_approval.sql
+09/10/2010  19:58             1,471 create_account_shipping_rate.sql
+09/10/2010  19:58             1,178 create_account_shipping_surcharge.sql
+09/10/2010  19:58             1,839 create_brand_ban.sql
+09/10/2010  19:58             2,175 create_external_seller_account.sql
+09/10/2010  19:58             1,890 create_notification.sql
+09/10/2010  19:58             1,805 create_store.sql
+09/10/2010  19:58             2,826 create_store_address.sql
+09/10/2010  19:58             2,331 create_store_contact.sql
+09/10/2010  19:58             1,442 create_store_rule_approval.sql
+-------------------------------------------------------------------
+09/10/2010  19:58             1,225 delete_account.sql
+-------------------------------------------------------------------
+09/10/2010  19:58             3,688 edit_account.sql
+09/10/2010  19:58             3,203 edit_account_address.sql
+09/10/2010  19:58             1,546 edit_account_contact.sql
+09/10/2010  19:58               711 edit_account_message.sql
+09/10/2010  19:58             1,092 edit_account_notification.sql
+09/10/2010  19:58             1,368 edit_account_rule_approval.sql
+09/10/2010  19:58               986 edit_account_user.sql
+09/10/2010  19:58             2,193 edit_notification.sql
+09/10/2010  19:58             1,404 edit_store.sql
+09/10/2010  19:58             2,626 edit_store_address.sql
+09/10/2010  19:58             2,118 edit_store_contact.sql
+09/10/2010  19:58             2,083 edit_store_operating_time.sql
+09/10/2010  19:58             2,135 edit_store_operating_time_override.sql
+09/10/2010  19:58             1,501 edit_store_rule_approval.sql
+-------------------------------------------------------------------
+09/10/2010  19:58             2,346 get_accounts.sql
+09/10/2010  19:58             1,243 get_account_address.sql
+09/10/2010  19:58             1,955 get_account_attributes.sql
+09/10/2010  19:58             1,793 get_account_attribute_value.sql
+09/10/2010  19:58               607 get_account_ba.sql
+09/10/2010  19:58             1,235 get_account_brand_ban.sql
+09/10/2010  19:58             1,691 get_account_budget.sql
+09/10/2010  19:58               604 get_account_cc.sql
+09/10/2010  19:58             1,669 get_account_contact.sql
+09/10/2010  19:58             1,632 get_account_count.sql
+09/10/2010  19:58               972 get_account_id_by_alternate_key.sql
+09/10/2010  19:58             1,190 get_account_id_by_attribute_value.sql
+09/10/2010  19:58               793 get_account_id_by_ban_value.sql
+09/10/2010  19:58             1,369 get_account_messages.sql
+09/10/2010  19:58             1,310 get_account_notification.sql
+09/10/2010  19:58             1,022 get_account_rule_approval.sql
+09/10/2010  19:58               468 get_account_shards.sql
+09/10/2010  19:58             1,107 get_account_shipping_rates.sql
+09/10/2010  19:58               738 get_account_shipping_surcharges.sql
+09/10/2010  19:58               548 get_account_status.sql
+09/10/2010  19:58               369 get_account_status_desc.sql
+09/10/2010  19:58               558 get_account_user_by_token.sql
+09/10/2010  19:58               378 get_aggregator_by_name.sql
+09/10/2010  19:58               336 get_all_account_attributes.sql
+09/10/2010  19:58               535 get_attributes.sql
+09/10/2010  19:58               531 get_available_vid.sql
+09/10/2010  19:58             1,226 get_global_attributes.sql
+09/10/2010  19:58             1,172 get_info_prep_monthly_billing.sql
+09/10/2010  19:58             2,279 get_notification.sql
+09/10/2010  19:58               470 get_notification_type.sql
+09/10/2010  19:58             1,843 get_pending_acknowledgment.sql
+09/10/2010  19:58               472 get_return_policy_by_account.sql
+09/10/2010  19:58               434 get_shards.sql
+09/10/2010  19:58               433 get_shipping_mode.sql
+09/10/2010  19:58             1,571 get_store.sql
+09/10/2010  19:58               972 get_store_address_by_store_id.sql
+09/10/2010  19:58             1,739 get_store_attribute_value.sql
+09/10/2010  19:58             1,117 get_store_contact_by_store_id.sql
+09/10/2010  19:58             1,300 get_store_operating_time.sql
+09/10/2010  19:58             1,377 get_store_operating_time_override.sql
+09/10/2010  19:58             1,083 get_store_rule_approval.sql
+09/10/2010  19:58               372 get_store_type.sql
+09/10/2010  19:58             1,043 get_sudo_accounts.sql
+09/10/2010  19:58             1,443 get_user_accounts.sql
+-------------------------------------------------------------------
+09/10/2010  19:58               758 modify_return_policy.sql
+-------------------------------------------------------------------
+09/10/2010  19:58               920 produce_resultset.sql
+09/10/2010  19:58               938 remove_store_operating_time_override.sql
+09/10/2010  19:58             1,253 set_store_operating_time.sql
+-------------------------------------------------------------------
+09/10/2010  19:58               845 update_account_shipping_rate.sql
+09/10/2010  19:58               671 update_account_shipping_surcharge.sql
+09/10/2010  19:58             3,734 upsert_account_attribute_value.sql
+09/10/2010  19:58             4,013 upsert_store_attribute_value.sql
+-------------------------------------------------------------------
