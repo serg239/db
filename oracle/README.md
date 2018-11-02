@@ -4,6 +4,7 @@ Examples of table's management in Oracle DB
 * Oracle Dynamic Performance Views (DPV) Hand-Book application
   * [picture 1](as_par/picture_01.png)
   * [picture 2](as_par/picture_02.png)
+
 The internal database of DPV consists of information about:
 - 742 objects
 - grouped in 142 classes
