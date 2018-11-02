@@ -3,9 +3,16 @@ Applications to work with Oracle DB Objects
 
 AS-TRANS - Oracle SQL statement Transcriber
 -------------------------------------------
-Transform Oracle SQL statements to unified and readable format:
-  * [picture 1](as_trans/as_trans_picture_01.png)
-  * [picture 2](as_trans/as_trans_picture_02.png)
+
+Transform Oracle SQL statements to unified and well-documented format:
+* [picture 1](as_trans/as_trans_picture_01.png)
+* [picture 2](as_trans/as_trans_picture_02.png)
+The new SQL statement has: 
+* description of all query tables/views
+* links to the Oracle documentation
+* descrtiption and available values of all columns in the statement
+* info about compatibility with different Oracle versions
+User can add Title and Hint to the result SQL statement.
 
 AS-PAR - Hand-Book of Oracle Classified Documented and Classified Un-Documented Parameters
 ------------------------------------------------------------------------------------------
