@@ -1,0 +1,56 @@
+# =============================================================================
+# /srv/salt/ns/cassandra/files/iptables.jinja
+# =============================================================================
+
+# This iptables template is managed by Saltstack.
+# Please configure from the Salt-Master server.
+{% set hostname=grains['id'] %}
+
+*filter
+
+# Drop any traffic not explicitly allowed in the rules below.
+:INPUT DROP
+:FORWARD DROP
+:OUTPUT ACCEPT
+
+# Allow all loopback (lo0) traffic
+-A INPUT -i lo -j ACCEPT
+
+# Drop all traffic to 127/8 that doesn't use lo0
+-A INPUT ! -i lo -d 127.0.0.0/8 -j DROP
+
+# Accept inbound traffic for already established connections.
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# Allow ping
+-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT
+
+# Allow connection to the services running on this server.
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+
+# Looping through the pillar data in ports.sls in order to open the appropriate ports.
+
+{%- if pillar['ports'][hostname] is defined %}
+{%- if pillar['ports'][hostname]['internal_ports'] is defined %}
+{%- for port in pillar['ports'][hostname]['internal_ports'] %}
+-A INPUT -p tcp --dport {{ port }} -j ACCEPT
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+
+{%- if pillar['ports'][hostname] is defined -%}
+{%- if pillar['ports'][hostname]['public_ports'] is defined -%}
+{%- for port in pillar['ports'][hostname]['public_ports'] %}
+-A INPUT -p tcp --dport {{ port }} -j ACCEPT
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+
+COMMIT
+
+## If the firewall needs to be disabled, run the following command:
+##
+## iptables-save | sed "/-/d;/^#/d;s/DROP/ACCEPT/" | iptables-restore      

@@ -1,0 +1,24 @@
+# =============================================================================
+# files/cassandra_22x.yaml
+# files/cassandra_30x.yaml
+# =============================================================================
+
+{% from 'node/settings.sls' import config as c with context %}
+
+cluster_name: {{ c.cluster_name }}
+authenticator: {{ c.authenticator}}
+authorizer: {{ c.authorizer }}
+data_file_directories:
+{% for d in c.data_file_directories %}
+  - {{ d }}
+{% endfor %}
+commitlog_directory: {{ c.commitlog_directory }}
+saved_caches_directory: {{ c.saved_caches_directory }}
+seed_provider:
+    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+      parameters:
+          - seeds: "{% for seed in c.seeds %}{{ seed[0] }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+listen_address: {{ grains.fqdn_ip4[0] }}
+rpc_address: {{ grains.fqdn_ip4[0] }}
+endpoint_snitch: {{ c.endpoint_snitch }}
