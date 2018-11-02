@@ -66,6 +66,7 @@ Notes
   - 9.0.1
   - 9.2.0
   - 10.1.0
-  - TBD
+  - 11.x - TBD
+  - 12.x - TBD
 
 2. Convenient Search system in all applications.
