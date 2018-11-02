@@ -13,6 +13,4 @@ cassandra:
     - database
     - data
   'cas-node0':
-#   - match: list
     - opscenter    
-#   - hostconfig
