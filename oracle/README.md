@@ -1,39 +1,57 @@
 Applications to work with Oracle DB Objects
--------------------------------------------
+===========================================
 
-* AS-TRANS - Oracle SQL statement transcriber - transform Oracle SQL statement to readable format
-See:
+AS-TRANS - Oracle SQL statement Transcriber
+-------------------------------------------
+Transform Oracle SQL statements to unified and readable format:
   * [picture 1](as_trans/as_trans_picture_01.png)
   * [picture 2](as_trans/as_trans_picture_01.png)
 
-* AS-DPV - Oracle Dynamic Performance Views (DPV) Hand-Book application
-  * [picture 1](as_par/picture_01.png)
-  * [picture 2](as_par/picture_02.png)
+AS-PAR - Hand-Book of Oracle Classified Documented and Classified Un-Documented Parameters
+------------------------------------------------------------------------------------------
 
-The internal database of DPV consists of information about:
-- 742 objects
-- grouped in 142 classes
-- for Oracle versions:
-  - 8.0.5, 
-  - 8.1.5, 
-  - 8.1.6, 
-  - 8.1.7, 
-  - 9.0.1,
-  - 9.2.0,
-  - 10.1.0
+Includes information about 1391 parameters grouped in 182 classes.
+* [picture 1](as_par/as_par_picture_01.png)
+* [picture 2](as_par/as_par_picture_02.png)
 
-The specific information about all DPV objects:
-- columns
-- datatypes
-- description with available values
+The common information about Parameters is grouped in the tabs:
+- Purpose
+- Properties
+- Description
+- Values
+- Warnings
+- Comments
+- Links to other sources
+- See also - link to Oracle docs (per version)
 
-The common information about all objects are grouped in the tabs:
+AS-DPV - Hand-Book of Oracle Dynamic Performance Views (DPV)
+------------------------------------------------------------
+
+Includes information about 742 objects grouped in 142 classes:
+* [picture 1](as_dpv/as_dpv_picture_01.png)
+* [picture 2](as_dpv/as_dpv_picture_02.png)
+
+The specific information about all DPV objects: column names; column datatypes; column description with available values.
+The common information about DPV objects is grouped in the tabs:
 - Purpose
 - Description
 - Warnings
 - Comments
 - Build (parent SQL and dependencies)
 - Links to other sources
-- See also - link to Oracle docs
+- See also - link to Oracle docs (per version)
 
-Convenient DPV Classes Search system  
+AS-SDDV - Hand-Book of Oracle System Data Dictionary Views (SDDV)
+-----------------------------------------------------------------
+* TBD
+
+All applications have information (and could be filtered) about components of the following Oracle versions:
+  - 8.0.5 
+  - 8.1.5 
+  - 8.1.6 
+  - 8.1.7 
+  - 9.0.1
+  - 9.2.0
+  - 10.1.0
+
+Convenient Search system in all applications.
