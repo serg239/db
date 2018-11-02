@@ -5,7 +5,7 @@ AS-TRANS - Oracle SQL statement Transcriber
 -------------------------------------------
 Transform Oracle SQL statements to unified and readable format:
   * [picture 1](as_trans/as_trans_picture_01.png)
-  * [picture 2](as_trans/as_trans_picture_01.png)
+  * [picture 2](as_trans/as_trans_picture_02.png)
 
 AS-PAR - Hand-Book of Oracle Classified Documented and Classified Un-Documented Parameters
 ------------------------------------------------------------------------------------------
