@@ -1,4 +1,4 @@
-# SQL and Shell scripts to create and manage a different types of Databases
+# Scripts to create and manage a different types of Databases
 
 * Database management in [MySQL](mysql/README.md) Database
 * Applications to work with [Oracle](oracle/README.md) Database
