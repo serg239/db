@@ -16,16 +16,19 @@ The internal database of DPV consists of information about:
   - 9.0.1,
   - 9.2.0,
   - 10.1.0
-The specific information about all objects:
-  - columns
-  - datatypes
-  - description of all columns with available values
-The common information about all objects:
-  - purpose
-  - description
-  - warnings
-  - comments
-  - build (parent SQL and dependencies)
-  - links to other sources
-  - see also - link to Oracle docs
+
+The specific information about all DPV objects:
+- columns
+- datatypes
+- description with available values
+
+The common information about all objects are grouped in the tabs:
+- Purpose
+- Description
+- Warnings
+- Comments
+- Build (parent SQL and dependencies)
+- Links to other sources
+- See also - link to Oracle docs
+
 Convenient DPV Classes Search system  
