@@ -13,8 +13,9 @@ The new SQL statement has:
 * links to the Oracle documentation
 * descrtiption and available values of all columns in the statement
 * info about compatibility with different Oracle versions
+
 User can add Title and Hint to the result SQL statement.
-User can define the custom format for outputs.
+User can define the custom format for the outputs (see [util](as_trans/util) directory).
 
 AS-PAR - Hand-Book of Oracle Classified Documented and Classified Un-Documented Parameters
 ------------------------------------------------------------------------------------------
