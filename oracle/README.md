@@ -1,7 +1,12 @@
-Examples of table's management in Oracle DB
+Applications to work with Oracle DB Objects
 -------------------------------------------
 
-* Oracle Dynamic Performance Views (DPV) Hand-Book application
+* AS-TRANS - Oracle SQL statement transcriber - transform Oracle SQL statement to readable format
+See:
+  * [picture 1](as_trans/as_trans_picture_01.png)
+  * [picture 2](as_trans/as_trans_picture_01.png)
+
+* AS-DPV - Oracle Dynamic Performance Views (DPV) Hand-Book application
   * [picture 1](as_par/picture_01.png)
   * [picture 2](as_par/picture_02.png)
 
