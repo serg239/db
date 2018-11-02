@@ -1,7 +1,8 @@
 Examples of cassandra database configuration
 --------------------------------------------
 1. SaltStack pillar, files, and states (including orchestration states) to configure cassandra database cluster.
-> Usage:
+
+Usage:
 > $ salt-run state.orchestrate -l debug orch.stack saltenv=cassandra
 
 2. Cassandra use cases:
