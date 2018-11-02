@@ -13,8 +13,10 @@ The new SQL statement has:
 * links to the Oracle documentation
 * descrtiption and available values of all columns in the statement
 * info about compatibility with different Oracle versions
+
 User can add Title and Hint to the result SQL statement.
-User can define the custom format for outputs.
+
+User can define the custom format for the outputs (see [util](as_trans/util) directory) also.
 
 AS-PAR - Hand-Book of Oracle Classified Documented and Classified Un-Documented Parameters
 ------------------------------------------------------------------------------------------
@@ -54,7 +56,9 @@ AS-SDDV - Hand-Book of Oracle System Data Dictionary Views (SDDV)
 -----------------------------------------------------------------
 * TBD
 
-All applications have information (and could be filtered) about components of the following Oracle versions:
+Notes
+-----
+1. All applications have information (and could be filtered) about components of the following Oracle versions:
   - 8.0.5 
   - 8.1.5 
   - 8.1.6 
@@ -62,5 +66,7 @@ All applications have information (and could be filtered) about components of th
   - 9.0.1
   - 9.2.0
   - 10.1.0
+  - 11.x - TBD
+  - 12.x - TBD
 
-Convenient Search system in all applications.
+2. Convenient Search system in all applications.

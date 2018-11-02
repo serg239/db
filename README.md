@@ -1,8 +1,8 @@
 # SQL and Shell scripts to create and manage a different types of Databases
 
-* Database management in [mysql](https://github.com/serg239/db/tree/master/mysql/) Database
-* Distributed tables in [greenPlum](greenplum/README.md) Database
-* Flow Data Records [postgres](postgres/README.md) Database
-* Use Cases for [cassandra](cassandra/README.md) Database
-* Configuration of [mongoDB](mongoDB/README.md) Database
-* Applications to work with [oracle](oracle/README.md) database
+* Database management in [MySQL](mysql/README.md) Database
+* Applications to work with [Oracle](oracle/README.md) Database
+* Flow Data Records [PostgreSQL](postgres/README.md) Database
+* Distributed tables in [GreenPlum](greenplum/README.md) Database
+* Use Cases for [Cassandra](cassandra/README.md) Database
+* Configuration of [MongoDB](mongoDB/README.md) Database
