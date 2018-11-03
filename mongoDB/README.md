@@ -25,3 +25,6 @@ Example of host with mongoDB as backend for web application
     - web-appl
 * top.sls for states and pillars
 * test states for the installed components
+
+Notes:
+* These are just examples but not working projects.
