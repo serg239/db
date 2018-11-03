@@ -1,0 +1,74 @@
+Source SQL script:
+------------------
+
+set feedback on
+select a.sid,a.serial#,a.username,
+	b.owner,b.object,b.type
+from 
+	v$session a
+	,v$access b
+where
+	a.sid = b.sid
+and	(a.username != 'SYS' and a.username != 'SYSTEM')
+/
+
+Well Documented SQL script:
+---------------------------
+
+REM /**********************************************************/
+REM  SCRIPT
+REM    check_access_t1.sql
+REM  TITLE
+REM    
+REM  HINT
+REM    
+REM  COMMENTS
+REM    # Query Tables and Views:
+REM    =========================
+REM    V$SESSION - Lists Session information for Each current Session.
+REM    V$ACCESS  - Displays Objects in the Database that are currently Locked and the Sessions
+REM                that are Accessing them.
+REM    # Links:
+REM    ========
+REM    http://otn.oracle.com/docs/products/oracle9i/doc_library/release2/server.920/a96536/ch3170.htm#109918
+REM    http://otn.oracle.com/docs/products/oracle9i/doc_library/release2/server.920/a96536/ch32.htm#108607
+REM    # Script Description:
+REM    =====================
+REM  NOTES
+REM    * Sid      - Session identifier
+REM    * Serial#  - Session serial number. Used to identify uniquely a
+REM                 session's objects. Guarantees that session-level commands
+REM                 are applied to the correct session objects if the session
+REM                 ends and another session begins with the same session ID
+REM    * Username - Oracle username
+REM    * Owner    - Owner of the object
+REM    * Object   - Name of the object
+REM    * Type     - Type identifier for the object
+REM  COMPATIBILITY
+REM    805, 815, 816, 817, 901, 920
+REM /**********************************************************/
+
+@../../util/_BEGIN
+@../../util/_TITLE "" 180 "check_access_t1.sql"
+
+COLUMN sid       FORMAT 999999       HEADING "Sid"
+COLUMN serial#   FORMAT 999,999,999  HEADING "Serial#"
+COLUMN username  FORMAT A16          HEADING "Username"
+COLUMN owner     FORMAT A64          HEADING "Owner"
+COLUMN object    FORMAT A64          HEADING "Object" WRAP
+COLUMN type      FORMAT A12          HEADING "Type"
+
+SELECT a.sid,
+       a.serial#,
+       a.username,
+       b.owner,
+       b.object,
+       b.type 
+  FROM v$session a,
+       v$access b 
+ WHERE a.sid = b.sid
+   AND (a.username != 'SYS'
+          AND a.username != 'SYSTEM')
+/
+
+@../../util/_END

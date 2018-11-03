@@ -1,0 +1,104 @@
+Source SQL script:
+------------------
+
+select * from x$ksmlru
+/
+
+Well Documented SQL script:
+---------------------------
+
+REM /**********************************************************/
+REM  SCRIPT
+REM    check_active_t1.sql
+REM  TITLE
+REM    
+REM  HINT
+REM    
+REM  COMMENTS
+REM    # Query Tables and Views:
+REM    =========================
+REM    SYS.X$KSMLRU - Tracks allocations in the Shared Pool that cause other Objects
+REM                   in the Shared Pool to be aged out.
+REM    # Links:
+REM    ========
+REM    none
+REM    # Script Description:
+REM    =====================
+REM    # Table(s)/View(s) Description:
+REM    ===============================
+REM    SYS.X$KSMLRU:
+REM    1. Acronym Expanded: Kernel Service, Memory LRU.
+REM    2. This fixed table can be used to identify what is causing the large allocation.
+REM    3. The advantage of X$KSMLRU is that it allows you to identify problems with
+REM       fragmentation that are effecting performance, but that are not bad enough to be
+REM       causing ORA-04031 errors to be signalled. If a lot of objects are being
+REM       periodically flushed from the shared pool then this will cause response time
+REM       problems and will likely cause library cache latch contention problems when the
+REM       objects are reloaded into the shared pool. With version 7.2, the library cache
+REM       latch contention should be significantly reduced with the breaking up of the
+REM       library cache pin latch into a configurable set of symmetric library cache
+REM       latches.
+REM       One unusual thing about the x$ksmlru fixed table is that the contents of the
+REM       fixed table are erased whenever someone selects from the fixed table. This is
+REM       done since the fixed table stores only the largest allocations that have
+REM       occurred.  The values are reset after being selected so that subsequent large
+REM       allocations can be noted even if they were not quite as large as others that
+REM       occurred previously.  Because of this resetting, the output of selecting from
+REM       this table should be carefully noted since it cannot be reselected if it is
+REM       forgotten.  Also you should take care that there are not multiple people on one
+REM       database that select from this table because only one of them will select the
+REM       real data.
+REM       To monitor this fixed table just run the following:
+REM       SELECT *
+REM         FROM x$ksmlru
+REM        WHERE ksmlrsiz > 5000;
+REM    4. That query on this table can only be done once;
+REM       subsequent query returns no rows unless large chunk shared pool
+REM       allocations happened in the interim.
+REM  NOTES
+REM    * Addr     - Table address
+REM    * Indx     - Index of the row
+REM    * Inst Id  - ID of the instance
+REM    * Ksmlrcom - Allocation comment that describes the type of allocation
+REM                 If this comment is something like 'MPCODE' or 'PLSQL%'
+REM                 then there is a large PL/SQL object being loaded into the
+REM                 shared pool. This PL/SQL object will need to be 'kept' in the
+REM                 shared pool.
+REM                 If this comment is 'kgltbtab' then the allocation is for a
+REM                 dependency table in the library cache. This is only a problem
+REM                 when several hundred users are logged on using distinct user ids.
+REM                 The solution in this case is to use fully qualified names
+REM                 for all table references.
+REM    * Ksmlrsiz - Amount of contiguous memory being allocated. Values over
+REM                 around 5K start to be a problem, values over 10K are a serious
+REM                 problem, and values over 20K are very serious problems.
+REM                 Anything less then 5K should not be a problem
+REM    * Ksmlrnum - Number of objects that were flushed from the shared pool
+REM                 in order allocate the memory.
+REM    * Ksmlrhon - The name of the object being loaded into the shared pool
+REM                 if the object is a PL/SQL object or a cursor
+REM    * Ksmlrohv - Hash value of object being loaded
+REM    * Ksmlrses - SADDR of the session that loaded the object.
+REM  COMPATIBILITY
+REM    805, 815, 816, 817, 901, 920
+REM /**********************************************************/
+
+@../../util/_BEGIN
+@../../util/_TITLE "" 140 "check_active_t1.sql"
+
+COLUMN addr      FORMAT A8           HEADING "Addr"
+COLUMN indx      FORMAT 999,999,999  HEADING "Indx"
+COLUMN inst_id   FORMAT 999,999,999  HEADING "Inst Id"
+COLUMN ksmlrcom  FORMAT A20          HEADING "Ksmlrcom"
+COLUMN ksmlrsiz  FORMAT 999,999,999  HEADING "Ksmlrsiz"
+COLUMN ksmlrnum  FORMAT 999,999,999  HEADING "Ksmlrnum"
+COLUMN ksmlrhon  FORMAT A32          HEADING "Ksmlrhon"
+COLUMN ksmlrohv  FORMAT 999,999,999  HEADING "Ksmlrohv"
+COLUMN ksmlrses  FORMAT A8           HEADING "Ksmlrses"
+
+SELECT * 
+  FROM x$ksmlru
+/
+
+@../../util/_END
+
