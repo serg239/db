@@ -9,10 +9,10 @@ Transform Oracle SQL statements to unified and well-documented format:
 * [picture 2](as_trans/as_trans_picture_02.png)
 
 The new SQL statement has: 
-* description of all query tables/views
-* links to the Oracle documentation
+* description of all system tables and views in the statement
 * descrtiption and available values of all columns in the statement
-* info about compatibility with different Oracle versions
+* link(s) to the Oracle documentation about used tables and views
+* info about workability of statement in different Oracle versions
 
 User can add Title and Hint to the result SQL statement.
 
