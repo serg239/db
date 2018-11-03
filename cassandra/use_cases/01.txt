@@ -1,0 +1,186 @@
+Initial deployment of the Cassandra Cluster
+===========================================
+
+Description
+-----------
+User creates a Cassandra Database Cluster for the <cluster_name> service 
+by using a Salt state script.
+
+Assumptions
+-----------
+1. The Cluster should have 2 Seed Nodes and 2 Regular Nodes in one Data Center.
+
+Prerequisites
+-------------
+1. See "Preconditions for all Cassandra Images".
+
+Notes
+-----
+<cluster_name>       - Cluster name
+<cassandra_user>     - OS user name
+<cassandra_user_pwd> - OS user password
+<node_ip>            - IP address of the current node
+<db_user>            - DB user name
+<db_user_pwd>        - DB user password    
+<ks_name>            - Keyspace (schema) name
+<cf_name>            - Column Family (table) name
+
+1. Define the IP addresses of Seed Nodes on each Cluster Node
+-------------------------------------------------------------
+
+Edit the "seeds" section in the cassandra.yaml file: 
+- seeds: "<seed_node1_ip>,<seed_node2_ip>"
+Example:
+- seeds: "10.10.60.72,10.10.60.74"
+
+2. Define the listenIP addresses on each Cluster Node
+-----------------------------------------------------
+
+Edit the "listen_address" and "rpc_address" values 
+in the cassandra.yaml file: 
+
+listen_address: <node_ip>
+rpc_address: <node_ip>
+
+Example:
+listen_address:10.10.60.71
+rpc_address:10.10.60.71
+
+3. Start the Cassandra Java Server process on all Seed Nodes first
+------------------------------------------------------------------
+
+# sudo service cassandra start
+
+Notes:
+1. The Cassandra service runs as a Java process.
+2. Startup scripts are provided in /etc/init.d file.
+3. The service runs as the "cassandra" user.
+
+4. Start the Cassandra process on all Regular Nodes
+---------------------------------------------------
+
+Attention: It should be done after staring the cassandra 
+service on ALL Seed Nodes only!
+
+# sudo service cassandra start
+
+5. Open the cqlsh client session on one of the Cluster Nodes
+------------------------------------------------------------
+Connect to the Casandra Database 
+
+$ cqlsh -u <cassandra_user> -p <cassandra_user_pwd> <node_ip>
+
+6. Create a <db_user> database user in the Cassandra Database
+-------------------------------------------------------------
+
+> CREATE USER '<db_user>' WITH PASSWORD '<db_user_pwd>';
+
+and grant privileges: 
+
+> GRANT ALL ON ALL KEYSPACES TO <db_user>;
+
+7. Create a <ks_name> Keyspace (schema) in the Cassandra Database
+----------------------------------------------------------------------
+
+> CREATE KEYSPACE IF NOT EXISTS <ks_name>
+  WITH REPLICATION = {'class': 'NetworkTopologyStrategy', 'dc1': 1} 
+  AND DURABLE_WRITES = true;
+
+8. Create a <cf_name> Column Family (table) in the <ks_name> Keyspace
+---------------------------------------------------------------------
+
+Example:
+> CREATE TABLE IF NOT EXISTS <ks_name>.<cf_name> (
+    customer_id             INT,
+    client_type             TEXT,
+    client_id               TEXT,
+    user_name               TEXT,
+    attributes              MAP<TEXT, TEXT>,
+    cassandra_lucene_index  TEXT,
+    connection_status       TEXT,
+    last_status_update_time TIMESTAMP,
+    source                  TEXT,
+    PRIMARY KEY ((customer_id, client_type), client_id, user_name)
+  ) WITH CLUSTERING ORDER BY (client_id ASC, user_name ASC);
+
+9. Create a Lucene Index on the <cf_name> Column Family
+-------------------------------------------------------
+
+> CREATE CUSTOM INDEX IF NOT EXISTS <cf_name>_lucene_idx
+    ON <ks_name>.<cf_name> (cassandra_lucene_index)
+    USING 'com.stratio.cassandra.lucene.Index'
+    WITH OPTIONS = {
+      'refresh_seconds' : '10',
+      'schema' : '{
+      fields : {
+        client_id : {type : \"text\"},
+        user_name : {type : \"text\"},
+        connection_status : {type : \"text\"},
+        last_status_update_time : {type : \"date\"}
+      }
+    }'
+  };
+
+10. Populate the test record into the table
+-------------------------------------------
+
+Example:
+> INSERT INTO <ks_name>.<cf_name> (customer_id, client_type, client_id, user_name, \
+  attributes, cassandra_lucene_index, connection_status, last_status_update_time, source) 
+  VALUES
+  (1, 'SITE', '1001', '', {'clientSWVersion': '7.0', 'machineId': '1234567889', \
+  'machineName': 'local', 'osInfo': 'Windows'}, null, 'CONNECTED', '2018-11-02 19:11:32', \
+  'manual');
+
+11. Check if data has been inserted into the table
+--------------------------------------------------
+
+> SELECT * FROM <ks_name>.<cf_name>;
+
+12. The Final State
+-------------------
+
+The Cassandra Cluster is ready for data collection.
+
+Extensions
+----------
+
+1. The Cassandra process was not started on Seed Node(s):
+1.1. Check if cassandra.yaml and cassandra-topology.properties configuration 
+     files has been updated from salt-master.
+1.2. Check the cassandra log file on Seed Nodes.
+
+2. The Cassandra process was not started on Regular Node(s):
+2.1. Check if cassandra.yaml and cassandra-topology.properties configuration 
+     files has been updated from salt-master.
+2.2. Check the cassandra log file on Regular Nodes.
+
+3. The cqlsh client session has not been established:
+3.1. Check if <node_ip> option is specified in the cqlsh command.
+
+4. The 'ops' user has not been created:
+4.1. Check if 'cassandra' database user has privileges on users' creation.
+  > SELECT is_superuser FROM system_auth.roles WHERE role='<cassandra_user>';
+  True
+
+5. Keyspace (schema) has not been created:
+5.1. Check if Database user has privileges on keyspaces' creation.
+  > SELECT is_superuser FROM system_auth.roles WHERE role='<cassandra_user>';
+  True
+
+6. Column family (table) has not been created:
+6.1. Check if <ks_name> Keyspace has been created.
+  > DESC KEYSPACES;
+notifications ...
+
+7. Lucene Index has not been created:
+7.1. Check if the cassandra-lucene-index-plugin-2.1.x.x.jar file exists 
+     in the /usr/share/cassandra/lib directory.
+Note: 
+The plugin version must correspond the version of the cassandra server.
+
+8. Data was not populated into the database:
+8.1. Check the cluster status:
+
+  $ nodetool status <cluster_name>
+

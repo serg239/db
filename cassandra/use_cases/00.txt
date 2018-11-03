@@ -1,0 +1,95 @@
+Preconditions for all Cassandra Images
+======================================
+
+1. The following components are installed on the Node:
+
+  * python v2.7
+  * java v1.8
+  * ntp
+  * firewall
+  * cassandra
+  * cassandra lucene index
+  * cassandra-python driver [for salt environment only]
+  * salt-minion [for salt environment only]
+
+2. The following groups and users are installed:
+
+  cassandra/cassandra
+
+3. The following ports are opened:
+
+  7000
+  7001
+  7199
+  9042
+  9160
+
+4. The following settings are included in the 
+/etc/security/limits.conf file:
+
+  #<domain> <type> <item> <value>
+  * - memlock unlimited
+  * - nofile 100000
+  * - nproc 32768
+  * - as unlimited
+
+5. The nproc limits are changed in the 
+/etc/security/limits.d/20-nproc.conf file:
+
+  # * soft nproc 4096
+  * - nproc 32768
+
+6. The max_map_count value is added to the 
+/etc/sysctl.conf file:
+
+  vm.max_map_count = 131072
+
+7. The path to the cassandra is included in the PATH environment variable.
+
+8. The cassandra process has not been started during the image installation.
+
+9. The cassandra-topology.properties configuration file must have the following values:
+
+  dc=dc1
+  rack=rack1
+
+10. The cassandra.yaml configuration file has the following not default values:
+
+  cluster_name: <cluster_name>
+  authenticator: PasswordAuthenticator
+  authorizer: CassandraAuthorizer
+  data_file_directories:
+  - /var/lib/cassandra/data
+  commitlog_directory: /var/lib/cassandra/commitlog
+  saved_caches_directory: /var/lib/cassandra/saved_caches
+  seed_provider:
+  - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+
+  parameters:
+  - seeds: "<seed_node1_ip>,<seed_node2_ip>,..."
+
+  listen_address: <node_ip>
+  rpc_address: <node_ip>
+  endpoint_snitch: GossipingPropertyFileSnitch
+
+Notes
+-----
+
+Seed Nodes serve two purposes:
+
+1. They act as a place for new Nodes to announce themselves to a Cluster. 
+So, without at least one live Seed Node, no new Nodes can join the Cluster 
+because they have no idea how to contact Non-Seed Nodes to get the Cluster
+status.
+
+2. Seed nodes act as GOSSIP hot spots. 
+Since Nodes GOSSIP more often with Seeds than Non-Seeds, the Seeds tend 
+to have more current information, and therefore the whole Cluster has more 
+current information. This is the reason you are instructed to not make 
+all nodes Seeds. Similarly, this is also why all Nodes in a given Data 
+Center should have the same list of Seed Nodes in their cassandra.yaml file. 
+Typically, 3 seed nodes per data center is ideal.
+(see http://wiki.apache.org/cassandra/ArchitectureGossip)
+
+3. The rack and datacenter for the local Node are defined in the 
+cassandra-rackdc.properties file and propagated to other nodes via GOSSIP.

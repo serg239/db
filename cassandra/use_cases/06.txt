@@ -1,0 +1,41 @@
+Shutdown of a Single Regular Node of an existing Cassandra Cluster
+==================================================================
+
+Description
+-----------
+User stops a Single Regular Node in the existing Cassandra Database Cluster 
+by using a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. Regular Node is not the last Node in the existing Cassandra Cluster.
+
+Pre-conditions
+--------------
+1. The Regular Node is up and running.
+2. The IP address of Regular Node is defined in the "shutdown_node" pillar.
+
+Post-conditions
+---------------
+1. The cassandra process is stopped on Regular Node.
+
+Main Success Scenario
+---------------------
+1. User runs the shutdown_node.sls Salt state script.
+2. The system stops the Cassandra Java server process.
+
+Extensions
+----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on the Regular Node.
+
+2. If Cassandra has not stopped:
+2.1. Stop the Regular Node manually:
+  $ sudo service cassandra stop
+
+Notes:
+------
+1. The cassandra service runs as a Cassandra Java server process.
+2. You must have root or sudo permissions to stop Cassandra as a service.
+3. The service runs as the <cassandra_user> user.
+4. Startup scripts are provided in /etc/init.d file.

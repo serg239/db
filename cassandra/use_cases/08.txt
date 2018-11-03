@@ -1,0 +1,42 @@
+Replacing a Single Running Node of an existing Cassandra Cluster
+================================================================
+
+Description
+-----------
+Steps to replace a Running Node with a New Node, such as when updating 
+to newer hardware or performing proactive maintenance.
+User replaces a Single Running Node in the existing Cassandra Database Cluster 
+by using a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. The Running Node is not the last Node in the Cluster.
+
+Pre-conditions
+--------------
+1. The Replacement Node is prepared, integrated into the Cluster, and started.
+2. The IP address of the running Node (<ip_address_of_running_node>) 
+   is defined in the "replace_running_node" pillar.
+
+Post-conditions
+---------------
+1. The Running Node is replaced with a New Node.
+
+Main Success Scenario
+---------------------
+1. User runs the replace_running_node.sls Salt state script.
+2. System stops the cassandra process on Running Node. 
+3. System updates the cassandra-topology.properties configuration file 
+   on the Replacement Node.
+4. System updates the cassandra.yaml configuration file 
+   on the Replacement Node.
+5. System starts the Cassandra process on the Replacement Node 
+   and wait 2 min.
+6. System runs the "cleanup" job on EACH of the previously existing Nodes 
+   to remove the keys no longer belonging to those Nodes.
+
+Extensions
+----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on the Running 
+     and Replacement Nodes.

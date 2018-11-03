@@ -1,0 +1,69 @@
+Deployment of a Cassandra Cluster to be a backup of an Operational Cluster (mirror)
+===================================================================================
+
+Description
+-----------
+Steps to add a Data Center to a Cassandra Cluster, such as when adding capacity 
+to an existing Cluster or creating a setup when cassandra streams data to the 
+backup cluster as it's added.
+User adds a new Data Center to an existing Cassandra Database Cluster by using 
+a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. The Cassandra Cluster is up and running.
+2. The Nodes of new Data Center are created but not started.
+
+Pre-conditions
+--------------
+1. The IP addresses and other configuration parameters is defined 
+   in the "add_data_center" pillar.
+2. The client application does not autodetect the Nodes of the new Data Center 
+   so that they aren't contacted by the client until explicitly directed.
+
+Post-conditions
+---------------
+1. The new Data Center is added to the existing Cassandra Cluster.
+
+Main Success Scenario
+---------------------
+1. User runs the add_data_center.sls Salt state script.
+2. System updates the cassandra.yaml configuration file on EACH Node 
+   of the new Data Center
+3. System, in case of using PropertyFileSnitch, updates the 
+   cassandra-topology.properties configuration file on ALL Nodes 
+   to include a new Nodes.
+4. System defines if using a QUORUM consistency level for reads or writes, 
+   and checks the LOCAL_QUORUM or EACH_QUORUM consistency level to see 
+   if the level meets the requirements for multiple Data Centers.
+5. System starts the Cassandra process on ALL Seed Node(s) 
+   of the new Data Center.
+6. System starts the Cassandra process on ALL Regular Node(s) 
+   of the new Data Center.
+7. System changes the strategy_options for <ks_name> Keyspace 
+   to the desired replication factor (defined in the pillar) 
+   for the new Data Center.
+8. System runs the "nodetool rebuild" command on EACH Node 
+   in the new Data Center.
+
+Notes [cassandra.yaml]
+----------------------
+1. seed lists: 
+   EVERY Node in the Cluster must have the same list of Seeds 
+   and include at least one node from each Data Center. 
+   Typically one to three Seeds are used per Data Center.
+2. The NetworkTopologyStrategy is used for <ks_name> and other 
+   custom Keyspaces.
+
+Notes [strategy_options]
+------------------------
+1. Increasing the replication factor increases the total number of copies 
+   of each row of data. System updates the number of replicas by updating 
+   the strategy_options of the keyspace.
+
+Extensions
+----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on all nodes 
+     on the new Data Center.
+  

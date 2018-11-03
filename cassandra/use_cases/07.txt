@@ -1,0 +1,44 @@
+Replacing a Single Dead Node of an existing Cassandra Cluster
+=============================================================
+
+Description
+-----------
+Steps to replace a Node that has died for some reason, such as hardware failure.
+User replaces a Single Dead Node in the existing Cassandra Database Cluster 
+by using a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. The Dead Node is not the last Node in the Cluster.
+2. The nodetool command shows a down status for the Dead Node (DN).
+
+Pre-conditions
+--------------
+1. The Replacement Node is prepared, configured, but not started.
+2. The IP address of the Dead Node (<ip_address_of_dead_node>) is defined in the 
+   "replace_dead_node" Pillar.
+
+Post-conditions
+---------------
+1. The Dead Node is replaced with a New Node.
+
+Main Success Scenario
+---------------------
+1. User runs the replace_dead_node.sls Salt state script.
+2. System adds the following option to the cassandra-env.sh file:
+  JVM_OPTS="$JVM_OPTS -Dcassandra.replace_address=<ip_address_of_dead_node>"
+3. System starts the Replacement Node with new replace_address option.
+4. System removed the added option (after the New Node finishes bootstrapping) 
+   from cassandra-env.sh file.
+
+Extensions
+-----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on the Replacement Node.
+
+2. The Cassandra has not started:
+2.1. Start the service manually:
+
+  $ sudo service cassandra start
+
+2.2. Check the Log files.

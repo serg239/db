@@ -1,0 +1,48 @@
+Deployment of a Single Seed Node to existing Cassandra Cluster
+==============================================================
+
+Description
+-----------
+User adds a Single Seed Node to the existing Cassandra Database Cluster by using 
+a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. The cassandra process on the new Seed Node is stopped.
+
+Pre-conditions
+--------------
+1. The Roles of Seed Node in the Cassandra Cluster are defined as Grains on the Seed Node.
+2. The IP address of Seed Node is defined in the "add_node" Pillar.
+
+Post-conditions
+---------------
+1. The new Seed Node has been added to the Cassandra Cluster.
+2. The data in the Cassandra Cluster has been redistributed between all Nodes.
+
+Main Success Scenario
+---------------------
+1. User runs the add_node.sls Salt state script.
+2. System updates the cassandra-topology.properties configuration file 
+   on the new Seed Node.
+3. System updates the cassandra.yaml configuration file on the new Seed Node 
+   and ALL previously existing Nodes.
+4. System starts the cassandra process on the new Seed Node.
+5. System runs the "cleanup" job on EACH of the previously existing Nodes 
+   to remove the keys no longer belonging to those Nodes.
+
+Extensions
+----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on the Seed Node.
+
+2.1. The cassandra process has not started:
+2.1. Check if cassandra.yaml and cassandra-topology.properties configuration 
+     files has been updated.
+2.2. Check the Log files.
+
+Notes
+-----
+The seeds list property in the cassandra.yaml configuration file determines 
+which Nodes the new Node should contact to learn about the Cluster and establish 
+the GOSSIP process.

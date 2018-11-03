@@ -1,0 +1,47 @@
+Shutting down the Cassandra Cluster
+===================================
+
+Description
+-----------
+User stops a Cassandra Database Cluster by using a Salt state script 
+or predefined scenario (manually).
+
+Assumptions
+-----------
+1. Cassandra Database Cluster is up and running.
+
+Pre-conditions
+--------------
+1. The <cluster_name> Service has stopped the data insertion into Cassandra Database.
+
+Post-conditions
+---------------
+1. The Cassandra Cluster has stopped, i.e. all cassandra processes has stopped 
+on ALL Cluster Nodes.
+
+Main Success Scenario
+---------------------
+1.User runs the "stop_stack.sls" Salt state script.
+2.System flashes the data from memory caches to data files.
+3.System stops the Cassandra process on Regular Node(s).
+4.System stops the Cassandra process on Seed Node(s).
+
+Extensions
+----------
+
+1. The Salt state script was not started:
+1.1. Check if salt-minion process has been started on all Cluster Nodes.
+
+2. The data has not been flashed from caches to data files.
+2.1. Wait about 2 min till the process end.
+2.2. Flash the data manually from CLI.
+
+3. The process on Regular Nodes has not been stopped.
+3.1. Stop the cassandra process on Regular Nodes manually from CLI, 
+     one at a time, and wait about 2 min. after that.
+
+4. The process on Seed Nodes has not been stopped.
+4.1. Stop the cassandra process on Seed Nodes manually from CLI, 
+     one at a time.
+
+

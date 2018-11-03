@@ -1,0 +1,44 @@
+Deployment of a Single Regular Node to an existing Cassandra Cluster
+====================================================================
+
+Description
+-----------
+User adds a Single Regular Node to the existing Cassandra Database Cluster 
+by using a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. The cassandra process on the new Regular Node is stopped.
+
+Pre-conditions
+--------------
+1. The Roles of Regular Node in the Cassandra Cluster are defined as Grains on the Regular Node.
+
+2. The IP address of Regular Node is defined in the "add_node" Pillar.
+
+Post-conditions
+---------------
+1. The new Regular Node has been added to the Cassandra Cluster.
+2. The data in the Cassandra Cluster has been redistributed between ALL Nodes.
+
+Main Success Scenario
+---------------------
+1. User runs the add_node.sls Salt state script.
+2. System updates the cassandra-topology.properties configuration file 
+   on the new Regular Node.
+3. System updates the cassandra.yaml configuration file 
+   on the new Regular Node.
+4. System starts the Cassandra process on the new Regular Node 
+   and wait 2 min.
+5. System runs the "cleanup" job on EACH of the previously existing Nodes 
+   to remove the keys no longer belonging to those Nodes.
+
+Extensions
+----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on the Regular Node.
+
+2. The cassandra process has not started:
+2.1. Check if cassandra.yaml and cassandra-topology.properties configuration 
+     files has been updated.
+2.2. Check the Log files.

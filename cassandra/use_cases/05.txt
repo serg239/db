@@ -1,0 +1,43 @@
+Shutdown of a Single Seed Node of an Existing Cassandra Cluster
+===============================================================
+
+Description
+-----------
+User stops a Single Seed Node in the existing Cassandra Database Cluster
+by using a Salt state script or predefined scenario (manually).
+
+Assumptions
+-----------
+1. Seed Node is not the last Seed Node and not the last Node 
+   in the Cassandra Cluster.
+
+Preconditions
+-------------
+1. The Seed Node is up and running.
+2. The IP address of Seed Node is defined in the "shutdown_node" pillar.
+
+Post-conditions
+---------------
+1. The cassandra process is stopped on Seed Node.
+
+Main Success Scenario
+---------------------
+1. User runs the shutdown_node.sls Salt state script.
+2. The system stops the Cassandra Java server process.
+
+Extensions
+----------
+1. The Salt state script has not started:
+1.1. Check if salt-minion process has been started on the Seed Node.
+
+2. If Cassandra has not stopped:
+2.1. Stop the Seed Node manually:
+  $ sudo service cassandra stop
+
+Notes:
+------
+1. The cassandra service runs as a Cassandra Java server process.
+2. You must have root or sudo permissions to stop Cassandra as a service.
+3. The service runs as the <cassandra_user> user.
+4. Startup scripts are provided in /etc/init.d file.
+
