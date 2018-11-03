@@ -1,0 +1,14 @@
+{%- set host_mgmt_ip = salt['grains.get']('ip4_interfaces:eth0')[0] %}
+{%- set m = salt['pillar.get']('mongodb', {}) %}
+{%- set mp_name = m.get('mpName', 'dev1') %}
+
+{%- for r in m.replicas %}
+{%- set idx = loop.index0 %}
+{%- if idx == 0 %}
+cfg = {"_id":"{{ mp_name }}rs1","version":1,"members":[{"_id":0,"host":"{{ host_mgmt_ip }}:{{ m.replicas[r].port }}"}]}
+rs.initiate(cfg)
+{%- else %}
+rs.add("{{ host_mgmt_ip }}:{{ m.replicas[r].port }}")
+{%- endif %}
+{%- endfor %}
+

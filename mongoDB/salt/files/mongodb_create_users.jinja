@@ -1,0 +1,27 @@
+{%- set m = salt['pillar.get']('mongodb', {}) %}
+
+{%- set admin_user    = m.get('adminUser', 'admin') %}
+{%- set admin_pwd     = m.get('adminPwd', '') %}
+{%- set root_user     = m.get('rootUser', 'root') %}
+{%- set root_pwd      = m.get('rootPwd', '') %}
+{%- set local_ro_user = m.get('localROUser', 'projro') %}
+{%- set local_ro_pwd  = m.get('localROPwd', '') %}
+
+{%- set admin_db_name = m.get('adminDBName', 'admin') %}
+{%- set proj_db_name   = m.get('projDBName', 'proj') %}
+{%- set main_db_name  = m.get('mainDBName', 'proj-dbv01') %}
+
+use {{ admin_db_name }}
+db.createUser({user:"{{ admin_user }}", pwd:"{{ admin_pwd }}", roles:["userAdminAnyDatabase"]})
+
+db.auth(user='{{ admin_user }}', pwd='{{ admin_pwd }}')
+db.runCommand({authSchemaUpgrade:1})
+
+db.createUser({user:"{{ local_ro_user }}", pwd:"{{ local_ro_pwd }}", roles:[{role:"read", db:"local"}]})
+
+use {{ proj_db_name }}
+db.runCommand({dropUser:"{{ root_user }}", writeConcern: { w: "majority", wtimeout: 5000 }})
+db.createUser({user: "{{ root_user }}", pwd: "{{ root_pwd }}", roles: [{ role: "readWrite", db: "{{ proj_db_name }}"}]})
+
+use {{ main_db_name }}
+db.addUser("{{ root_user }}", "{{ root_pwd }}", false)

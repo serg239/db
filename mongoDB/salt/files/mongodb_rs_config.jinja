@@ -1,0 +1,13 @@
+port = {{ replica_port_num }}
+dbpath = {{ mongodb_data_dir }}/{{ mp_name }}rs{{ replica_port_num }}
+fork = true
+replSet = {{ mp_name }}rs1
+logpath = {{ mongodb_log_dir }}/{{ mp_name }}rs{{ replica_port_num }}/projMongo.log
+logappend = true
+directoryperdb = true
+rest = true
+master = false
+smallfiles = true
+auth = true
+keyFile = {{ mongodb_home_dir }}/{{ key_file_name }}
+

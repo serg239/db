@@ -1,0 +1,11 @@
+{%- set m = salt['pillar.get']('mongodb', {}) %}
+{%- set mp_name             = m.get('mpName', 'dev1') %}
+{%- set mongodb_home_dir    = m.get('mongodbHomeDir', '/opt/mongodb') %}
+{%- set mongodb_config_dir  = m.get('mongodbConfigDir', '/opt/mongodb/conf') %}
+{%- set mongodb_daemon_file = m.get('mongodbDaemonFile', '/opt/mongodb/bin/mongod') %}
+
+# cd {{ mongodb_home_dir }}/bin
+{%- for r in m.replicas %}
+nohup {{ mongodb_daemon_file }} --config {{ mongodb_config_dir }}/{{ mp_name }}rs{{ m.replicas[r].port }}.conf &
+{%- endfor %}
+

@@ -1,0 +1,40 @@
+{#- set mgmt_ip = salt['grains.get']('ip4_interfaces:eth0')[0] #}
+{%- set n = salt['pillar.get']('network', {}) %}
+{%- set mgmt_ip = n.get('proj', {}).get('proj1', {}).get('mgmtP', '10.10.62.172') %} 
+{%- set mgmt_network   = ".".join(mgmt_ip.split('.')[0:-1]) + '.0' %}
+{%- set mgmt_broadcast = ".".join(mgmt_ip.split('.')[0:-1]) + '.255' %}
+{%- set mgmt_gateway   = ".".join(mgmt_ip.split('.')[0:-1]) + '.1' %}
+{%- set data_ip = n.get('proj', {}).get('proj1', {}).get('dataIP', '192.168.3.172') %}
+{%- set data_network   = ".".join(data_ip.split('.')[0:-1]) + '.0' %}
+{%- set data_broadcast = ".".join(data_ip.split('.')[0:-1]) + '.255' %}
+{%- set data_gateway   = ".".join(data_ip.split('.')[0:-1]) + '.1' %}
+{%- set domain_name = n.get('domainName', 'cloudsol') %}
+{%- set dns_servers = n.get('dnsServers', '10.9.62.71') %}
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+# =========================================
+# The loopback network interface
+#
+auto lo
+iface lo inet loopback
+# =========================================
+# The primary network interfaces
+#
+auto eth0
+iface eth0 inet static
+        address {{ mgmt_ip }}
+        netmask 255.255.255.0
+        network {{ mgmt_network }}
+        broadcast {{ mgmt_broadcast }}
+        gateway {{ mgmt_gateway }}
+        # dns-* options are implemented by the resolvconf package, if installed
+        dns-domain {{ domain_name }}
+        dns-nameservers {{ ' '.join(dns_servers) }}
+auto eth1
+iface eth1 inet static
+        address {{ data_ip }}
+        netmask 255.255.255.0
+        network {{ data_network }}
+        broadcast {{ data_broadcast }}
+        gateway {{ data_gateway }}
+

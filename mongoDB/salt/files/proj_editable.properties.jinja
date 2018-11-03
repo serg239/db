@@ -1,0 +1,7 @@
+{%- set n = salt['pillar.get']('network', {}) %}
+{%- set project_mgmt_ip = n.get('project', {}).get('project1', {}).get('mgmtIP', '') %}
+
+enableIPBasedAuthentication=true
+writeAllowedIPList={{ project_mgmt_ip }}
+enableProjStats=true
+

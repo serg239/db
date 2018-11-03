@@ -1,0 +1,43 @@
+{%- set host_mgmt_ip = salt['grains.get']('ip4_interfaces:eth0')[0] %}
+
+{%- set wa = salt['pillar.get']('web-appl', {}) %}
+{%- set proj_artifact = wa.get('artifact', 'proj-2.0') %}
+
+{%- set m = salt['pillar.get']('mongodb', {}) %}
+{%- set rs_name       = m.get('rsName', 'projMongoReplSet1') %}
+{%- set main_db_name  = m.get('mainDBName', 'proj-dbv01') %}
+{%- set db_root_user  = m.get('rootUser', 'root') %}
+{%- set db_root_pwd   = m.get('rootPwd', 'N/A') %}
+{%- set local_ro_user = m.get('localROUser', 'projro') %}
+{%- set local_ro_pwd  = m.get('localROPwd', 'N/A') %}
+
+{%- set rs_hosts = [] %}
+{%- for r in m.replicas %}
+{%- do rs_hosts.append(host_mgmt_ip ~ ':' ~ m.replicas[r].port) %}
+{%- endfor %}
+
+mongoReplicaSetHost={{ ','.join(rs_hosts) }}
+mongoReplicaSetName={{ rs_name }}
+mongoDBName={{ main_db_name }}
+mongoProjRWUserName={{ db_root_user }}
+mongoProjRWPassword={{ db_root_pwd }}
+mongoLocalDBROUser={{ local_ro_user }}
+mongoLocalDBROPassword={{ local_ro_pwd }}
+apiBasePath=http://{{ host_mgmt_ip }}:8080/{{ proj_artifact }}/rest
+projArtifact={{ proj_artifact }}
+detaultCustomerPolicy=<policy></policy>
+maxVersionConflictRetry=10
+mongoOptions.autoConnectRetry.boolean=true
+mongoOptions.connectionsPerHost.int=100
+mongoOptions.connectTimeout.int=120000
+mongoOptions.socketKeepAlive.boolean=true
+mongoOptions.cursorFinalizerEnabled.boolean=true
+mongoOptions.writeConcern.com@mongodb@WriteConcern=ACKNOWLEDGED
+mongoRetryInitialInterval=500
+mongoRetryMaxInterval=5000
+mongoRetryIntervalMultiplier=1.5
+mongoRetryMaxAttempts=20
+mongoRetryTimeout=20000
+projWritePoolSize=100
+projWriteQueueSize=60
+
