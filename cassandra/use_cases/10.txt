@@ -1,0 +1,30 @@
+1. Run CQLSH as cassandra user:
+
+$ sudo runuser -l -s /bin/bash cassandra -c 'cqlsh 192.168.99.58 -u <db_user> -p <db_user_pwd> -e "DESC <ks_name>;"'
+
+2. Create Lucene Index:
+
+CREATE CUSTOM INDEX IF NOT EXISTS clientstatus_lucene_idx 
+    ON notifications.clientstatus (cassandra_lucene_index) 
+ USING 'com.stratio.cassandra.lucene.Index' 
+  WITH OPTIONS = { 
+    'refresh_seconds' : '60', 
+    'schema' : '
+      { fields : 
+        { client_id: {type: "string", sorted: true}, 
+          user_name: {type: "string", sorted: true}, 
+          connection_status: {type: "string", sorted: true}, 
+          source: {type: "string", sorted: true}, 
+          last_status_update_time: {type: "date", pattern: "yyyy/MM/dd HH:mm:Ss.SSS Z", sorted: true}, 
+          attributes: {type: "string", sorted: true} 
+        }
+      }'
+  };
+
+3. Alter keyspace on Cluster when adding a second DataCenter:
+  ALTER KEYSPACE <ks_name> WITH REPLICATION =
+    {'class' : 'NetworkTopologyStrategy', 'dc1' : 2, 'dc2' : 2};
+On each affected node, run: 
+  $ nodetool repair
+Wait until repair completes on a node, then move to the next node.
+

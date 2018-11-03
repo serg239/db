@@ -43,7 +43,7 @@ opscenter-configuration:
   file.symlink:
     - target: {{ home_dir }}-{{ version }}
     - watch:
-      - file: opscenter_configuration
+      - file: opscenter-configuration
 {% endif %}
 
 #

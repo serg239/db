@@ -1,0 +1,89 @@
+Adding a new node to the cassandra cluster
+==========================================
+
+Check the current state of the pillar [Salt-Master]: 
+# salt 'ops' pillar.item cassandra:regular:num_nodes
+Result:
+ops:
+    ----------
+    cassandra:regular:num_nodes:
+        3
+
+1. Increase the number of regular nodes [Salt-Master].
+======================================================
+Edit /srv/salt/pillar/dev/ns/cassandra/init.sls file:
+. . .
+  regular:
+    instance_name: ccr
+    num_nodes: 4              <-----
+. . .
+
+2. Refresh pillars in order for minions to see any fresh data [Salt-Master]:
+============================================================================
+# salt 'ops' saltutil.refresh_pillar
+Result:
+ops:
+    True
+
+3. Check updated pillar [Salt-Master]:
+======================================
+# salt 'ops' pillar.item cassandra:regular:num_nodes
+Result:
+ops:
+    ----------
+    cassandra:regular:num_nodes:
+        4
+
+4. Apply changes to heat environment file [Salt-Master]:
+=========================================================
+# salt 'ops' -l debug state.sls ns.set_heat_environment saltenv=dev
+Result:
+. . .
+                  -  ccr_num_nodes: 3
+                  +  ccr_num_nodes: 4
+. . .
+
+
+5. Check the value in the configuration file [Salt-Master]:
+===========================================================
+# vi dev-dc1-ns-environment.yaml
+. . . 
+   ### Cassandra::Regular nodes ###
+   ccr_instance_name: ccr
+   ccr_num_nodes: 4
+. . .   
+
+6. Update stack [OpenStack]:
+============================
+# heat stack-update dev-dc1 -f dev-dc1-ns-full.yaml -e dev-dc1-ns-environment.yaml
++--------------------------------------+--------------+--------------------+----------------------+
+| id                                   | stack_name   | stack_status       | creation_time        |
++--------------------------------------+--------------+--------------------+----------------------+
+| 534d2368-4ee8-4c44-980a-0e8b35e94008 | dev-dc1      | UPDATE_IN_PROGRESS | 2016-04-22T01:18:05Z |
++--------------------------------------+--------------+--------------------+----------------------+
+
+7. Check the process [OpenStack]:
+=================================
+# heat event-list dev-dc1
+
+8. Configuration [all nodes including new one, Salt-Master]:
+============================================
+# salt 'dev-dc1-cc*' -l debug cassandra_set_all saltenv=ns
+
+9. Starting the new node up [Salt-Master]:
+=======================================
+# salt 'dev-dc1-ccr3' -l debug state.sls cassandra_start_node saltenv=ns
+or
+use orchestration (see /srv/salt/ns/orch/cassandra_start_regular_nodes.sls)
+but with check if node already started
+
+10. Rebalancing teh nodes in the cluster [Salt-Master]:
+=======================================================
+Run the command on old nodes, one by one (or use ConfD nodetool command):
+"runuser -l -s /bin/bash cassandra -c 'nodetool cleanup'" from Salt state
+OR
+use orchestration (see /srv/salt/ns/orch/cassandra_start_regular_nodes.sls)
+
+
+
+

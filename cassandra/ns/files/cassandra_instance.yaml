@@ -1,0 +1,111 @@
+heat_template_version: 2015-04-30
+description: Deployment of single cassandra instance
+
+parameters:
+ admin_password:
+  type: string
+  description: User admin password
+  default: admin
+ enable_password:
+  type: string
+  description: enable password
+  default: admin
+ hostname:
+  type: string
+  description: host name
+  default: cassandra-mv
+ key:
+  type: string
+  label: Key name
+  description: Name of key-pair to be installed on the instance.
+  default: jdlkey
+ image:
+  type: string
+  label: Image name or ID
+  description: Image to be used for compute instance
+  default: coe-service-cassandra-185654-lvcloud.debug
+
+ hostname:
+   type: string
+   description: host name
+   default: cassandra
+
+ flavor:
+  type: string
+  label: Flavor
+  description: Type of instance (flavor) to be used
+  default: m1.small
+
+ private_net:
+  type: string
+  default: 32e8934b-33c1-49dc-89d1-50d9671a97c8 # NS-poc-network
+  description: Id of the ns network for the compute server
+
+ private_subnet:
+  type: string
+  default: 5d28d464-a882-4cdc-b980-95560ded9170 # ns-poc-subnet
+  description: Id of the private sub network for the compute server
+
+ public_net:
+  type: string
+  default: 4def5796-5456-4b2a-8535-2c45dbe8cb0e # Public network
+  description: Id of the public network for the compute server
+
+resources:
+
+ public_port:
+  type: OS::Neutron::Port
+  properties:
+   network_id: { get_param: private_net }
+   fixed_ips:
+    - subnet_id: { get_param: private_subnet }
+   security_groups:
+    - 5c35409f-532b-42d0-a766-634facae366a
+
+ floating_ip:
+  type: OS::Neutron::FloatingIP
+  properties:
+   floating_network_id: { get_param: public_net }
+   port_id: { get_resource: public_port }
+
+ cassandra:
+  type: OS::Nova::Server
+  properties:
+   name : { get_param: hostname }
+   image: { get_param: image }
+   flavor: { get_param: flavor }
+   key_name: { get_param: key }
+   networks:
+    - port: { get_resource: public_port }
+   user_data:
+     str_replace:
+       template: |
+        #!/bin/bash
+        echo "Initializing the Confd..." >> /var/log/cloud-init-output.log
+        cd /opt/bluecoat/clp/lib/scripts/
+        ./confd_initialize.py -p $admin_password -e $enable_password -hn $hostname
+        echo "master: 10.9.60.48" >> /etc/salt/proxy
+        echo "Initializing the Confd FINISHED" >> /var/log/cloud-init-output.log
+        sed -i 's/127\.0\.0\.1.*/& $hostname/' /etc/hosts
+        cd /tmp
+        wget http://192.168.99.116/python-zmq-14.3.1-1.el6.x86_64.rpm
+        mount -o remount,rw /
+        rpm -U python-zmq-14.3.1-1.el6.x86_64.rpm
+        mount -o remount,ro /
+        cd /tmp
+        nohup salt-proxy --proxyid=$hostname -l debug &
+       params:
+         $admin_password: { get_param: admin_password}
+         $enable_password: { get_param: enable_password}
+         $hostname: {get_param: hostname}
+outputs:
+ instance_name:
+  description: Name of the instance
+  value: { get_attr: [cassandra, name] }
+ private_ip:
+  description: Private network IP address assigned by Nova for this instance
+  value: { get_attr: [cassandra, first_address] }
+ public_ip:
+  description: Floating IP assigned by Nova for this instance
+  value: { get_attr: [ floating_ip, floating_ip_address ] }
+  

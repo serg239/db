@@ -1,0 +1,37 @@
+# This environment file will be used to define parameters for ns-full.yaml
+#
+# NOTE: Hostnames for the instances will be contstructed in the ns-full.yaml
+# template, this will be done taking the *_hostname, data_center, and %index%
+# and defining the hostname in the resource group. For example, the first
+# kafka instance will have the hostname "kc-dc1-0"
+
+parameters:
+  stack_name: production
+  data_center: dc1
+  salt_master: xxx.xxx.xxx.xxx
+  key_name: mykey
+
+  # Network paramters
+  private_network: ns-poc-network
+  private_subnet: ns-poc-subnet
+  public_network: public
+  secgroup: NS
+
+  # Kafka and Zookeeper
+  kz_image: coe-service-kafka-185714-lvcloud.debug
+  zookeeper_hostname: zkc
+  zookeeper_count: 3
+  kafka_hostname: kc
+  kafka_count: 3
+
+  # Cassandra
+  cc_image: coe-service-cassandra-186490-lvcloud.debug
+  cc_seed_hostname: ccs
+  cc_seed_count: 2
+  cc_regular_hostname: ccr
+  cc_regular_count: 2
+
+  # Notification Service
+  ns_image: cloud_ns_main-185514-lvcloud.debug
+  ns_hostname: ns
+  ns_count: 1

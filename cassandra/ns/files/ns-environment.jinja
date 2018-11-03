@@ -1,0 +1,58 @@
+# =============================================================================
+# File:
+#  /srv/salt/ns/files/ns-environment.jinja
+# Description:
+#   This environment file will be used to define parameters for ns-full.yaml
+# Notes:
+#   Hostnames for the instances will be contstructed in the ns-full.yaml
+#   template, this will be done taking the
+#     <*_hostname>-<data_center>-<%index%>
+#   and defining the hostname in the resource group.
+#   For example, the first kafka instance will have the hostname "kc-dc1-0".
+#   The instances have predefined roles [saved in grains on instances]:
+#     kafka, zookeeper, cassandra, ns
+# =============================================================================
+{% set po   = salt['pillar.get']('ops', {}) %}
+{% set pzkc = salt['pillar.get']('zookeeper', {}) %}
+{% set pkc  = salt['pillar.get']('kafka', {}) %}
+{% set pcc  = salt['pillar.get']('cassandra', {}) %}
+{% set pns  = salt['pillar.get']('notification_service', {}) %}
+
+parameters:
+  # OpenStack parameters
+  stack_name: production
+  data_center: dc1
+  key_name: jdlkey
+
+  # Salt Master IP [instances] 
+  salt_master: xxx.xxx.xxx.xxx
+
+  # Network parameters [ops]
+  private_network: ns-poc-network
+  private_subnet: ns-poc-subnet
+  public_network: public
+  secgroups: NS
+
+  # Zookeeper
+  kz_image: coe-service-kafka-185714-lvcloud.debug
+  zookeeper_hostname: zkc
+  zkc_num_nodes: 3
+
+  # Kafka
+  # the image is the same as for Zookeeper
+  kafka_hostname: kc
+  kc_num_nodes: 3
+
+  # Cassandra
+  cc_image: coe-service-cassandra-186704-lvcloud.debug
+  # Cassandra::Seed nodes
+  cc_seed_hostname: ccs
+  ccs_num_nodes: 3
+  # Cassandra::Regular nodes
+  cc_regular_hostname: ccr
+  ccr_num_nodes: 3
+
+  # Notification Service
+  ns_image: cloud_ns_main-185514-lvcloud.debug
+  ns_hostname: ns
+  ns_num_nodes: 1

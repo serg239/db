@@ -1,0 +1,157 @@
+{% set p  = salt['pillar.get']('cluster', {}) %}
+
+{% set image_name = p.get('image_name', 'coe-service-cassandra') %}
+{% set build_number = p.get('build_number', '185654') %}
+{% set build_type = p.get('build_type', 'lvcloud.debug') %}
+
+{% set flavor_name = p.get('ops_flavor_name', 'm1.small') %}
+{% set key_pair_name = p.get('ops_key_pair_name', 'jdlkey') %}
+{% set salt_master_ip = p.get('salt_master_ip', '10.9.60.48') %}
+
+{% set tmp_zeromq_pkg_ip = p.get('tmp_zeromq_pkg_ip', 'http://192.168.99.116') %}
+{% set tmp_zeromq_pkg_name = p.get('tmp_zeromq_pkg_name', 'python-zmq-14.3.1-1.el6.x86_64.rpm') %}
+
+{% set confd_admin_pwd = p.get('confd_admin_pwd', 'admin') %}
+{% set confd_enable_pwd = p.get('confd_enable_pwd', 'admin') %}
+
+{% set pc = p.get('config', {}) %}
+{% set cluster_name = pc.get('cluster_name', 'ns') %}
+{% set deployment = pc.get('deployment', 'dc1') %}
+{% set endpoint_snitch = pc.get('endpoint_snitch', 'GossipingPropertyFileSnitch') %}
+
+
+heat_template_version: 2015-04-30
+
+description: {{ image_name }}-{{ build_number }}-{{ build_type }}
+
+parameters:
+
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: {{ image_name }}-{{ build_number }}-{{ build_type }}
+
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: {{ flavor_name }}
+
+  key:
+    type: string
+    label: Key name
+    description: Name of key-pair to be installed on the instance.
+    default: {{ key_pair_name }}
+
+  public_network:
+   type: string
+   label: Public network name or ID
+   description: Public Network to attach instance to.
+   default: {% for network_name in pillar['cluster']['ops_public_networks'] %}{{ network_name }}{% endfor %}
+
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Private Network to attach instance to.
+    default: {% for network_name in pillar['cluster']['ops_private_networks'] %}{{ network_name }}{% endfor %}
+
+  private_subnet:
+    type: string
+    label: Private subnet name or ID
+    description: Id of the private sub network for the compute server
+    default: {% for subnet_name in pillar['cluster']['ops_private_subnets'] %}{{ subnet_name }}{% endfor %}
+
+resources:
+
+{% for instance_name in pillar['cluster']['ops_cassandra_instances'] %}
+  {{ instance_name }}:
+    type: OS::Nova::Server
+    # depends_on: [ {{ instance_name }}_floating_ip, {{ instance_name }}_port ]
+    properties:
+      name: "{{ instance_name }}"
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      networks:
+        - port: { get_resource: {{ instance_name }}_port }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            $assigned_private_ip: { get_attr: [ {{ instance_name }}_port, fixed_ips, 0, ip_address ] }
+            $assigned_public_ip: { get_attr: [ {{ instance_name }}_floating_ip, floating_ip_address ] }
+          template: |
+            #!/bin/bash
+            # Note: use -ex in production env
+            # Install ZeroMQ package
+            cd /tmp
+            wget {{ tmp_zeromq_pkg_ip }}/{{ tmp_zeromq_pkg_name }}
+            mount -o remount,rw /
+            rpm -U {{ tmp_zeromq_pkg_name }}
+            mount -o remount,ro /
+            # Initialize ConfD
+            echo "Initializing the ConfD..." >> /var/log/cloud-init-output.log
+            cd /opt/bluecoat/clp/lib/scripts/
+            ./confd_initialize.py -p {{ confd_admin_pwd }} -e {{ confd_enable_pwd }} -hn {{ instance_name }}
+            # Configure salt-proxy
+            echo "master: {{ salt_master_ip }} " >> /etc/salt/proxy
+            # Grains
+            echo "cluster:" > /etc/salt/grains
+            echo "  roles:" >> /etc/salt/grains
+            echo "    - database" >> /etc/salt/grains
+            echo "    - cassandra" >> /etc/salt/grains
+            {% if loop.index0 == 0 %}
+              echo "    - opscenter" >> /etc/salt/grains
+            {% endif %}
+            echo "  cluster_name: {{ cluster_name }}" >> /etc/salt/grains
+            echo "  deployment: {{ deployment }}" >> /etc/salt/grains
+            echo "  endpoint_snitch: {{ endpoint_snitch }}" >> /etc/salt/grains
+            {% if loop.index0 is even %}
+              echo "  node_type: seed" >> /etc/salt/grains
+            {% else%}
+              echo "  node_type: regular" >> /etc/salt/grains
+            {% endif %}
+            echo "  private_ip: $assigned_private_ip" >> /etc/salt/grains
+            echo "  public_ip: $assigned_public_ip" >> /etc/salt/grains
+            # Start salt-proxy processes
+            cd /root
+            nohup salt-proxy --proxyid={{ instance_name }} -l debug &
+            echo "Initializing the ConfD FINISHED" >> /var/log/cloud-init-output.log
+
+  {{ instance_name }}_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      fixed_ips:
+        - subnet: { get_param: private_subnet }
+      security_groups: {% for group_name in pillar['cluster']['ops_security_groups'] %}
+        - {{ group_name }}
+        {% endfor %}
+
+  {{ instance_name }}_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+      port_id: { get_resource: {{ instance_name }}_port }
+
+{% endfor %}
+
+outputs:
+{% for instance_name in pillar['cluster']['ops_cassandra_instances'] %}
+  {{ instance_name }}:
+    description: Name of the {{ instance_name }} instance
+    value: { get_attr: [ {{ instance_name }}, name ] }
+{% endfor %}
+
+{% for instance_name in pillar['cluster']['ops_cassandra_instances'] %}
+  {{ instance_name }}_private_ip:
+    description: IP address of {{ instance_name }} in private network
+    value: { get_attr: [ {{ instance_name }}, first_address ] }
+{% endfor %}
+
+{% for instance_name in pillar['cluster']['ops_cassandra_instances'] %}
+  {{ instance_name }}_public_ip:
+    description: Floating IP address of {{ instance_name }} assigned in public network
+    value: { get_attr: [ {{ instance_name }}_floating_ip, floating_ip_address ] }
+{% endfor %}

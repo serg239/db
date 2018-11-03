@@ -1,0 +1,126 @@
+# =============================================================================
+# File:
+#  /srv/salt/dev/ns/files/dev-dc1-ns-environment.jinja
+# Description:
+#   This environment file will be used to define parameters for ns-full.yaml
+# Notes:
+#   Hostnames for the instances will be contstructed in the ns-full.yaml
+#   template, this will be done taking the
+#     <stack_name>-<data_center>-<instance_name>-<%index%>
+#   and defining the host_name in the resource group.
+#   For example, the first "kafka" instance in the data center "dc1"
+#   for "dev" deployment will have the host_name:
+#      "dev-dc1-kc-0".
+#   The instances have predefined roles [saved in grains on instances]:
+#     zookeeper, kafka, cassandra, ns
+# =============================================================================
+{% set po   = salt['pillar.get']('ops', {}) %}
+{% set pzkc = salt['pillar.get']('zookeeper', {}) %}
+{% set pkc  = salt['pillar.get']('kafka', {}) %}
+{% set pcc  = salt['pillar.get']('cassandra', {}) %}
+{% set pccs = pcc.get('seed', {}) %}
+{% set pccr = pcc.get('regular', {}) %}
+{% set pns  = salt['pillar.get']('notification_service', {}) %}
+
+{# OpenStack parameters #}
+{% set stack_name  = po.get('stack_name', 'unknown') %}
+{% set data_center = po.get('data_center', 'unknown') %}
+{% set key_pair_name    = po.get('key_pair_name', 'unknown') %}
+
+{# Network parameters #}
+{% set private_network = po.get('private_network', 'unknown') %}
+{% set private_subnet  = po.get('private_subnet', 'unknown') %}
+{% set public_network  = po.get('public_network', 'unknown') %}
+
+{# Security Groups #}
+{% set security_groups  = po.get('security_groups', 'unknown') %}
+
+{# Zookeeper #}
+{% set zkc_instance_name = pzkc.get('instance_name', 'unknown') %}
+{% set zkc_num_nodes     = pzkc.get('num_nodes', 0) %}
+{% set zkc_image_name    = pzkc.get('image_name', 'coe-service-kafka-185714-lvcloud.debug') %}
+{% set zkc_flavor_name   = pzkc.get('flavor_name', 'm1.small') %}
+
+{# Kafka #}
+{% set kc_instance_name = pkc.get('instance_name', 'unknown') %}
+{% set kc_num_nodes     = pkc.get('num_nodes', 0) %}
+{% set kc_image_name    = pkc.get('image_name', 'coe-service-kafka-185714-lvcloud.debug') %}
+{% set kc_flavor_name   = pkc.get('flavor_name', 'm1.small') %}
+
+{# Cassandra #}
+{# Seed Nodes #}
+{% set ccs_instance_name = pccs.get('instance_name', 'unknown') %}
+{% set ccs_num_nodes     = pccs.get('num_nodes', 0) %}
+{# Regular Nodes #}
+{% set ccr_instance_name = pccr.get('instance_name', 'unknown') %}
+{% set ccr_num_nodes     = pccr.get('num_nodes', 0) %}
+{# Common #}
+{% set cc_image_name  = pcc.get('image_name', 'coe-service-cassandra-186704-lvcloud.debug') %}
+{% set cc_flavor_name = pcc.get('flavor_name', 'm1.small') %}
+
+{# Notification Service #}
+{% set ns_instance_name = pns.get('instance_name', 'unknown') %}
+{% set ns_num_nodes     = pns.get('num_nodes', 0) %}
+{% set ns_image_name    = pns.get('image_name', 'cloud_ns_main-185514-lvcloud.debug') %}
+{% set ns_flavor_name   = pns.get('flavor_name', 'm1.small') %}
+
+{# Cloud-Init parameters #}
+{% set tmp_zeromq_pkg_ip     = po.get('tmp_zeromq_pkg_ip', 'http://192.168.99.116/python-zmq-14.3.1-1.el6.x86_64.rpm') %}
+{% set tmp_zeromq_pkg_name   = po.get('tmp_zeromq_pkg_name', 'python-zmq-14.3.1-1.el6.x86_64.rpm') %}
+{% set confd_admin_password  = po.get('confd_admin_password', 'unknown') %}
+{% set confd_enable_password = po.get('confd_enable_password', 'unknown') %}
+{% set log_file_name         = po.get('log_file_name', '/var/log/cloud-init-output.log') %}
+{% set salt_master_ip        = po.get('salt_master_ip', '10.9.1.1') %}
+
+parameters:
+  ### OpenStack parameters ###
+  stack_name: {{ stack_name }}
+  data_center: {{ data_center }}
+  key_pair_name: {{ key_pair_name }}
+
+  ### Network parameters [ops] ###
+  private_network: {{ private_network }}
+  private_subnet: {{ private_subnet}}
+  public_network: {{ public_network }}
+
+  ### Security Groups ###
+  security_groups: {{ security_groups }}
+
+  ### Zookeeper ###
+  zkc_instance_name: {{ zkc_instance_name }}
+  zkc_num_nodes: {{ zkc_num_nodes}}
+  zkc_image_name: {{ zkc_image_name }}
+  zkc_flavor_name: {{ zkc_flavor_name }}
+
+  ### Kafka ###
+  kc_instance_name: {{ kc_instance_name }}
+  kc_num_nodes: {{ kc_num_nodes}}
+  kc_image_name: {{ kc_image_name }}
+  kc_flavor_name: {{ kc_flavor_name }}
+
+  ### Cassandra ###
+  ### Cassandra::Seed nodes ###
+  ccs_instance_name: {{ ccs_instance_name }}
+  ccs_num_nodes: {{ ccs_num_nodes}}
+  ### Cassandra::Regular nodes ###
+  ccr_instance_name: {{ ccr_instance_name }}
+  ccr_num_nodes: {{ ccr_num_nodes}}
+  ### Common ###
+  cc_image_name: {{ cc_image_name }}
+  cc_flavor_name: {{ cc_flavor_name }}
+
+  ### Notification Service ###
+  ns_instance_name: {{ ns_instance_name }}
+  ns_num_nodes: {{ ns_num_nodes}}
+  ns_image_name: {{ ns_image_name }}
+  ns_flavor_name: {{ ns_flavor_name }}
+
+  ### Cloud-Init parameters ###
+  tmp_zeromq_pkg_ip: {{ tmp_zeromq_pkg_ip }}
+  tmp_zeromq_pkg_name: {{ tmp_zeromq_pkg_name }}
+  confd_admin_password: {{ confd_admin_password }}
+  confd_enable_password: {{ confd_enable_password }}
+  log_file_name: {{ log_file_name }}
+
+  ### Salt Master IP [instances] ###
+  salt_master_ip: {{ salt_master_ip }}

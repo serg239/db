@@ -1,19 +1,14 @@
-﻿# =============================================================================
-# orch/remove_stack.sls
-# Usage:
-#   salt-run state.orchestrate -l debug orch.remove_stack saltenv=cassandra
-# =============================================================================
-{% set cas_role = 'cassandra' %}
+{% set cas_role = 'G@roles:cassandra and G@roles:database' %}
 
 remove-database:
   salt.state:
-    - tgt: 'G@roles:database'
-    - tgt_type: grain
+    - tgt: '{{ cas_role }} and G@roles:opscenter'
+    - tgt_type: compound
     - sls: remove_database
 
 remove-opscenter:
   salt.state:
-    - tgt: 'G@roles:database and G@node_type:opscenter'
+    - tgt: '{{ cas_role }} and G@roles:opscenter'
     - tgt_type: compound
     - sls: remove_opscenter
     - require:
@@ -21,23 +16,23 @@ remove-opscenter:
 
 remove-plugin:
   salt.state:
-    - tgt: 'G@roles:database'
-    - tgt_type: grain
+    - tgt: {{ cas_role }}
+    - tgt_type: compound
     - sls: remove_plugin
     - require:
       - salt: remove-database
 
 remove-driver:
   salt.state:
-    - tgt: 'G@roles:database'
-    - tgt_type: grain
+    - tgt: {{ cas_role }}
+    - tgt_type: compound
     - sls: remove_driver
     - require:
       - salt: remove-database
-			
+
 remove-node:
   salt.state:
-    - tgt: 'G@roles:database and G@node_type:regular'
+    - tgt: '{{ cas_role }} and G@node_type:regular'
     - tgt_type: compound
     - sls: remove_node
     - require:
@@ -45,7 +40,7 @@ remove-node:
 
 remove-seed:
   salt.state:
-    - tgt: 'G@roles:database and G@node_type:seed'
+    - tgt: '{{ cas_role }} and G@node_type:seed'
     - tgt_type: compound
     - sls: remove_seed
     - require:
@@ -53,16 +48,16 @@ remove-seed:
 
 remove-user:
   salt.state:
-    - tgt: 'G@roles:{{ cas_role }}'
-    - tgt_type: grain
+    - tgt: '{{ cas_role }}'
+    - tgt_type: compound
     - sls: remove_user
     - require:
       - salt: remove-seed
 
 remove-group:
   salt.state:
-    - tgt: 'G@roles:{{ cas_role }}'
-    - tgt_type: grain
+    - tgt: '{{ cas_role }}'
+    - tgt_type: compound
     - sls: remove_group
     - require:
       - salt: remove-user
@@ -70,24 +65,24 @@ remove-group:
 # remove-tune:
 #   salt.state:
 #     - tgt: 'G@roles:database'
-#     - tgt_type: grain
+#     - tgt_type: compound
 #     - sls: remove_tune
 #     - require:
 #       - salt: remove-node
 
 remove-iptables:
   salt.state:
-    - tgt: 'G@roles:{{ cas_role }}'
-    - tgt_type: grain
+    - tgt: '{{ cas_role }}'
+    - tgt_type: compound
     - sls: remove_iptables
     - require:
       - salt: remove-group
 
 remove-ntp:
   salt.state:
-    - tgt: 'G@roles:{{ cas_role }}'
-    - tgt_type: grain
+    - tgt: '{{ cas_role }}'
+    - tgt_type: compound
     - sls: remove_ntp
     - require:
       - salt: remove-group
-			
+

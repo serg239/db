@@ -4,9 +4,11 @@
 cassandra:
   'cas-node*':
     - ntp
+    - iptables
     - group
     - user
-    - iptables
+    - seed
+    - node
     - plugin
     - driver
     - tune

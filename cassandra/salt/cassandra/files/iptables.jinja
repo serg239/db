@@ -1,8 +1,4 @@
-# =============================================================================
-# /srv/salt/ns/cassandra/files/iptables.jinja
-# =============================================================================
-
-# This iptables template is managed by Saltstack.
+# This iptables template is managed by Saltstack. 
 # Please configure from the Salt-Master server.
 {% set hostname=grains['id'] %}
 
@@ -53,4 +49,5 @@ COMMIT
 
 ## If the firewall needs to be disabled, run the following command:
 ##
-## iptables-save | sed "/-/d;/^#/d;s/DROP/ACCEPT/" | iptables-restore      
+## iptables-save | sed "/-/d;/^#/d;s/DROP/ACCEPT/" | iptables-restore
+

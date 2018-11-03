@@ -1,0 +1,399 @@
+# =============================================================================
+# File:
+#  /srv/salt/dev/ns/files/dev-dc1-ns-full.yaml
+# Description:
+#   Heat template for DEV-DC1* stack creation
+# =============================================================================
+heat_template_version: 2015-04-30
+
+description: Heat template for DEV-DC1* stack creation
+
+parameters:
+
+  # Stack name
+  stack_name:
+    type: string
+    default: dev
+
+  # Data Center
+  data_center:
+    type: string
+    default: dc1
+
+  # Key Pair
+  key_pair_name:
+    type: string
+    default: jdlkey
+
+  ### Zookeeper ###
+  zkc_instance_name:
+    type: string
+    label: Zookeeper instance name
+    description: Name of the Zookeeper instance (part of the host_name)
+    default: zkc
+
+  zkc_role:
+    type: string
+    label: Zookeeper Role
+    description: Role of Zookeeper nodes in the NS
+    default: zookeeper
+
+  zkc_num_nodes:
+    type: number
+    label: Number of Zookeeper nodes (instances)
+    description: Number of Zookeeper nodes (instances) in the cluster
+    default: 3
+
+  zkc_image_name:
+    type: string
+    label: Zookeeper Image name or ID
+    description: Image to be used for Zookeeper instances
+    default: coe-service-kafka-185714-lvcloud.debug
+
+  zkc_flavor_name:
+    type: string
+    label: Zookeeper Flavor
+    description: Flavor to be used for Zookeeper instances
+    default: m1.small
+
+  ### Kafka ###
+  kc_instance_name:
+    type: string
+    label: Kafka instance name
+    description: Name of the Kafka instance (part of the host_name)
+    default: kc
+
+  kc_role:
+    type: string
+    label: Kafka Role
+    description: Role of Kafka nodes in the NS
+    default: kafka
+
+  kc_num_nodes:
+    type: number
+    label: Number of Kafka nodes (instances)
+    description: Number of Kafka nodes (instances) in the cluster
+    default: 3
+
+  kc_image_name:
+    type: string
+    label: Kafka Image name or ID
+    description: Image to be used for Kafka instances
+    default: coe-service-kafka-185714-lvcloud.debug
+
+  kc_flavor_name:
+    type: string
+    label: Kafka Flavor
+    description: Flavor to be used for Kafka instances
+    default: m1.small
+
+  ### Cassandra ###
+  # Seed Nodes #
+  ccs_instance_name:
+    type: string
+    label: Cassandra instance name for seed nodes
+    description: Name of the Cassandra seed node instance (part of the host_name)
+    default: ccs
+
+  ccs_num_nodes:
+    type: number
+    label: Number of Cassandra seed nodes (instances)
+    description: Number of Cassandra seed nodes (instances) in the cluster
+    default: 3
+
+  ccs_node_type:
+    type: string
+    label: Type of the Cassandra seed node (instances)
+    description: Type of the Cassandra seed node (instances) in the cluster
+    default: seed
+
+  # Regular Nodes #
+  ccr_instance_name:
+    type: string
+    label: Cassandra instance name for regular nodes
+    description: Name of the Cassandra regular node instance (part of the host_name)
+    default: ccr
+
+  ccr_num_nodes:
+    type: number
+    label: Number of Cassandra regular nodes (instances)
+    description: Number of Cassandra regular nodes (instances) in the cluster
+    default: 3
+
+  ccr_node_type:
+    type: string
+    label: Type of the Cassandra regular node (instances)
+    description: Type of the Cassandra regular node (instances) in the cluster
+    default: regular
+
+  # Common #
+  cc_role:
+    type: string
+    label: Cassandra Role
+    description: Role of the Cassandra nodes in the NS
+    default: cassandra
+
+  cc_image_name:
+    type: string
+    label: Cassandra Image name or ID
+    description: Image to be used for Cassandra instances
+    default: coe-service-cassandra-186704-lvcloud.debug
+
+  cc_flavor_name:
+    type: string
+    label: Cassandra Flavor
+    description: Flavor to be used for Cassandra instances
+    default: m1.small
+
+  ### Notification Service ###
+  ns_instance_name:
+    type: string
+    label: Notification Service instance name
+    description: Name of the Notification Service node instance (part of the host_name)
+    default: ns
+
+  ns_role:
+    type: string
+    label: Notification Service Role
+    description: Role of the Notification Service node
+    default: ns
+
+  ns_num_nodes:
+    type: number
+    label: Number of Notification Service nodes (instances)
+    description: Number of Notification Service nodes (instances) in the cluster
+    default: 1
+
+  ns_image_name:
+    type: string
+    label: Notification Service Image name or ID
+    description: Image to be used for Notification Service instance
+    default: cloud_ns_main-185514-lvcloud.debug
+
+  ns_flavor_name:
+    type: string
+    label: Notification Service Flavor
+    description: Flavor to be used for Notification Service instance
+    default: m1.small
+
+  ### Available Networks ###
+  private_network:
+    type: string
+    default: ns-internal
+    description: Id or name of the private network for the compute server
+
+  private_subnet:
+    type: string
+    default: ns-internal-subnet
+    description: Id or name of the private sub network for the compute server
+
+  public_network:
+    type: string
+    default: production
+    description: Id or name of the public network for the compute server
+
+  ### Security Group(s) ###
+  security_groups:
+    type: string
+    description: Security group(s) for the instances to use
+    default: NS
+
+  ### Salt-Master ###
+  salt_master_ip:
+    type: string
+    description: IP address of Salt master
+    default: 10.9.1.1
+
+  ### Broker ID for Kafka ###
+  broker_id:
+    type: string
+    default: 1
+
+  ### 0MQ package location ###
+  tmp_zeromq_pkg_ip:
+    type: string
+    default: http://192.168.99.116/python-zmq-14.3.1-1.el6.x86_64.rpm
+
+  tmp_zeromq_pkg_name:
+    type: string
+    default: python-zmq-14.3.1-1.el6.x86_64.rpm
+
+  confd_admin_password:
+    type: string
+    default: admin
+
+  confd_enable_password:
+    type: string
+    default: admin
+
+  ### Log File ###
+  log_file_name:
+    type: string
+    description: Log file
+    default: /var/log/cloud-init-output.log
+
+resources:
+
+  zookeeper_cluster:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: zkc_num_nodes }
+      resource_def:
+        type: zookeeper-instance.yaml
+        properties:
+          image_name: { get_param: zkc_image_name }
+          host_name:
+            str_replace:
+              template:
+                $stack_name-$data_center-$instance_name-$index
+              params:
+                $stack_name: { get_param: stack_name}
+                $data_center: {get_param: data_center }
+                $instance_name: { get_param: zkc_instance_name }
+                $index: "%index%"
+          flavor_name: { get_param: zkc_flavor_name}
+          key_pair_name: { get_param: key_pair_name }
+          role: { get_param: zkc_role }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          security_groups: { get_param: security_groups }
+          stack_name: { get_param: stack_name }
+          salt_master_ip: { get_param: salt_master_ip }
+          log_file_name: { get_param: log_file_name }
+          tmp_zeromq_pkg_ip: { get_param: tmp_zeromq_pkg_ip }
+          tmp_zeromq_pkg_name: { get_param: tmp_zeromq_pkg_name }
+          confd_admin_password: { get_param: confd_admin_password }
+          confd_enable_password: { get_param: confd_enable_password }
+
+  kafka_cluster:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: kc_num_nodes }
+      resource_def:
+        type: kafka-instance.yaml
+        properties:
+          image_name: { get_param: kc_image_name }
+          host_name:
+            str_replace:
+              template:
+                $stack_name-$data_center-$instance_name-$index
+              params:
+                $stack_name: { get_param: stack_name}
+                $data_center: {get_param: data_center }
+                $instance_name: { get_param: kc_instance_name }
+                $index: "%index%"
+          flavor_name: { get_param: kc_flavor_name}
+          key_pair_name: { get_param: key_pair_name }
+          role: { get_param: kc_role }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          security_groups: { get_param: security_groups }
+          stack_name: { get_param: stack_name }
+          salt_master_ip: { get_param: salt_master_ip }
+          log_file_name: { get_param: log_file_name }
+          tmp_zeromq_pkg_ip: { get_param: tmp_zeromq_pkg_ip }
+          tmp_zeromq_pkg_name: { get_param: tmp_zeromq_pkg_name }
+          confd_admin_password: { get_param: confd_admin_password }
+          confd_enable_password: { get_param: confd_enable_password }
+          broker_id: { get_param: broker_id }
+
+  cassandra_seed_cluster:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: ccs_num_nodes }
+      resource_def:
+        type: cassandra-instance.yaml
+        properties:
+          image_name: { get_param: cc_image_name }
+          host_name:
+            str_replace:
+              template:
+                $stack_name-$data_center-$instance_name-$index
+              params:
+                $stack_name: { get_param: stack_name}
+                $data_center: {get_param: data_center }
+                $instance_name: { get_param: ccs_instance_name }
+                $index: "%index%"
+          flavor_name: { get_param: cc_flavor_name}
+          key_pair_name: { get_param: key_pair_name }
+          role: { get_param: cc_role }
+          node_type: { get_param: ccs_node_type }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          security_groups: { get_param: security_groups }
+          stack_name: { get_param: stack_name }
+          salt_master_ip: { get_param: salt_master_ip }
+          log_file_name: { get_param: log_file_name }
+          tmp_zeromq_pkg_ip: { get_param: tmp_zeromq_pkg_ip }
+          tmp_zeromq_pkg_name: { get_param: tmp_zeromq_pkg_name }
+          confd_admin_password: { get_param: confd_admin_password }
+          confd_enable_password: { get_param: confd_enable_password }
+
+  cassandra_regular_cluster:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: ccr_num_nodes }
+      resource_def:
+        type: cassandra-instance.yaml
+        properties:
+          image_name: { get_param: cc_image_name }
+          host_name:
+            str_replace:
+              template:
+                $stack_name-$data_center-$instance_name-$index
+              params:
+                $stack_name: { get_param: stack_name}
+                $data_center: {get_param: data_center }
+                $instance_name: { get_param: ccr_instance_name }
+                $index: "%index%"
+          flavor_name: { get_param: cc_flavor_name}
+          key_pair_name: { get_param: key_pair_name }
+          role: { get_param: cc_role }
+          node_type: { get_param: ccr_node_type }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          security_groups: { get_param: security_groups }
+          stack_name: { get_param: stack_name }
+          salt_master_ip: { get_param: salt_master_ip }
+          flavor_name: { get_param: cc_flavor_name}
+          log_file_name: { get_param: log_file_name }
+          tmp_zeromq_pkg_ip: { get_param: tmp_zeromq_pkg_ip }
+          tmp_zeromq_pkg_name: { get_param: tmp_zeromq_pkg_name }
+          confd_admin_password: { get_param: confd_admin_password }
+          confd_enable_password: { get_param: confd_enable_password }
+
+  notification_service_instance:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: ns_num_nodes }
+      resource_def:
+        type: ns-instance.yaml
+        properties:
+          image_name: { get_param: ns_image_name }
+          host_name:
+            str_replace:
+              template:
+                $stack_name-$data_center-$instance_name-$index
+              params:
+                $stack_name: { get_param: stack_name}
+                $data_center: {get_param: data_center }
+                $instance_name: { get_param: ns_instance_name }
+                $index: "%index%"
+          flavor_name: { get_param: ns_flavor_name}
+          key_pair_name: { get_param: key_pair_name }
+          role: { get_param: ns_role }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          security_groups: { get_param: security_groups }
+          stack_name: { get_param: stack_name }
+          salt_master_ip: { get_param: salt_master_ip }
+          log_file_name: { get_param: log_file_name }
+          tmp_zeromq_pkg_ip: { get_param: tmp_zeromq_pkg_ip }
+          tmp_zeromq_pkg_name: { get_param: tmp_zeromq_pkg_name }
+          confd_admin_password: { get_param: confd_admin_password }
+          confd_enable_password: { get_param: confd_enable_password }

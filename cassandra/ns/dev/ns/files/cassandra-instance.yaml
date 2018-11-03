@@ -1,0 +1,194 @@
+# =============================================================================
+# File:
+#  /srv/salt/dev/ns/files/cassandra-instance.yaml
+# Description:
+#   Heat template for xxx-CCS* and xxx-CCR* instances
+# =============================================================================
+
+heat_template_version: 2015-04-30
+
+description: Heat Template for DEV-DC1-CCS* and DEV-DC1-CCR* stack creation
+
+parameters:
+
+  stack_name:
+    type: string
+    description: Stack name [dev|qa|stage|prod]
+    default: dev
+
+  data_center:
+    type: string
+    description: Data center [dc1|dc2]
+    default: dc1
+
+  host_name:
+    type: string
+    description: Host Name
+    default: dev-dc1-ccs-01
+
+  image_name:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: coe-service-cassandra-186704-lvcloud.debug
+
+  flavor_name:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: m1.small
+
+  key_pair_name:
+    type: string
+    label: Key pair name
+    description: Name of key-pair to be installed on the instance
+    default: jdlkey
+
+  role:
+    type: string
+    description: Role of the Node in the cluster
+    default: cassandra
+
+  node_type:
+    type: string
+    description: Type of node [seed|regular]
+    default: regular
+
+  security_groups:
+    type: string
+    description: Security group(s) for the instance to use
+    default: NS
+
+  public_network:
+    type: string
+    label: Public network name (or ID)
+    description: Public Network to attach instance to.
+    default: production
+
+  private_network:
+    type: string
+    label: Private network name (or ID)
+    description: Private Network to attach instance to.
+    default: ns-internal
+
+  private_subnet:
+    type: string
+    label: Private subnet name (or ID)
+    description: Id of the private sub network for the compute server
+    default: ns-internal-subnet
+
+  salt_master_ip:
+    type: string
+    description: IP address of Salt master
+    default: 10.9.60.48
+
+  ### 0MQ parameters ###
+  tmp_zeromq_pkg_ip:
+    type: string
+    default: http://192.168.99.116/python-zmq-14.3.1-1.el6.x86_64.rpm
+
+  tmp_zeromq_pkg_name:
+    type: string
+    default: python-zmq-14.3.1-1.el6.x86_64.rpm
+
+  confd_admin_password:
+    type: string
+    label: Admin ConfD password
+    description: Admin ConfD password
+    default: admin
+
+  confd_enable_password:
+    type: string
+    label: Enable ConfD password
+    description: Enable ConfD password
+    default: admin
+
+  ### Log File ###
+  log_file_name:
+    type: string
+    default: /var/log/cloud-init-output.log
+
+resources:
+
+  cassandra_port:
+    type: OS::Neutron::Port
+    properties:
+      network: { get_param: private_network }
+      fixed_ips:
+        - subnet: { get_param: private_subnet }
+      security_groups:
+        - { get_param: security_groups }
+
+  cassandra_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: public_network }
+      port_id: { get_resource: cassandra_port }
+
+  cassandra:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: host_name }
+      image: { get_param: image_name }
+      flavor: { get_param: flavor_name }
+      key_name: { get_param: key_pair_name }
+      networks:
+        - port: { get_resource: cassandra_port }
+      user_data:
+        str_replace:
+          params:
+            $stack_name: { get_param: stack_name }
+            $data_center: { get_param: data_center }
+            $host_name: {get_param: host_name }
+            $role: {get_param: role }
+            $node_type: { get_param: node_type }
+            $assigned_private_ip: { get_attr: [ cassandra_port, fixed_ips, 0, ip_address ] }
+            $assigned_public_ip: { get_attr: [ cassandra_floating_ip, floating_ip_address ] }
+            $tmp_zeromq_pkg_ip: { get_param: tmp_zeromq_pkg_ip }
+            $tmp_zeromq_pkg_name: { get_param: tmp_zeromq_pkg_name }
+            $confd_admin_password: { get_param: confd_admin_password }
+            $confd_enable_password: { get_param: confd_enable_password }
+            $salt_master_ip: { get_param: salt_master_ip }
+            $log_file_name: { get_param: log_file_name }
+          template: |
+            #!/bin/bash
+            echo "Initializing the Confd..." >> $log_file_name
+            cd /opt/bluecoat/clp/lib/scripts/
+            ./confd_initialize.py -p $confd_admin_password -e $confd_enable_password -hn $host_name
+            echo "Initializing the Confd FINISHED" >> $log_file_name
+            echo "Initializing the Instance..." >> $log_file_name
+            # Configure salt-proxy
+            echo "master: $salt_master_ip" >> /etc/salt/proxy
+            # Configure grains
+            echo "stack_name: $stack_name" > /etc/salt/grains
+            echo "data_center: $data_center" >> /etc/salt/grains
+            echo "role: $role" >> /etc/salt/grains
+            echo "node_type: $node_type" >> /etc/salt/grains
+            echo "private_ip: $assigned_private_ip" >> /etc/salt/grains
+            echo "public_ip: $assigned_public_ip" >> /etc/salt/grains
+            # Define the host name
+            sed -i 's/127\.0\.0\.1.*/& $host_name/' /etc/hosts
+            # Install ZeroMQ package
+            cd /tmp
+            wget $tmp_zeromq_pkg_ip
+            mount -o remount,rw /
+            rpm -U $tmp_zeromq_pkg_name
+            mount -o remount,ro /
+            # Start salt-proxy minion
+            cd /tmp
+            nohup salt-proxy --proxyid=$host_name -l debug &
+            echo "Initializing the Instance FINISHED" >> $log_file_name
+
+outputs:
+
+  instance_name:
+    description: Name of the instance
+    value: { get_attr: [ cassandra, name ] }
+
+  private_ip:
+    description: Private network IP address assigned by Nova to this instance
+    value: { get_attr: [ cassandra, first_address ] }
+
+  public_ip:
+    description: Floating IP assigned by Nova for this instance
+    value: { get_attr: [ cassandra_floating_ip, floating_ip_address ] }

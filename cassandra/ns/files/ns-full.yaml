@@ -1,0 +1,209 @@
+# =============================================================================
+#  Script:
+#    /etc/heat/templates/ns-full.yaml
+# Usage:
+#   heat stack-create -f /etc/heat/templates/ns-full.yaml
+# =============================================================================
+
+heat_template_version: 2015-04-30
+
+parameters:
+
+  # Stack name
+  stack_name:
+    type: string
+    default: dk
+
+  # Images
+  kz_image:
+    type: string
+    label: Kafka/Zookeeper Image name or ID
+    description: Image to be used for Kafka and Zookeeper instances
+    default: coe-service-kafka-186338-lvcloud.debug
+
+  cc_image:
+    type: string
+    label: Cassandra Image name or ID
+    description: Image to be used for Cassandra instances
+    default: coe-service-cassandra-186490-lvcloud.debug
+
+  ns_image:
+    type: string
+    label: NS Image name or ID
+    description: Image to be used for NS instances
+    default: cloud_ns_main-185514-lvcloud.debug
+
+  # Number of Instances
+  kafka_count:
+    type: number
+    default: 2
+
+  zk_count:
+    type: number
+    default: 2
+
+  cc_seed_count:
+    type: number
+    default: 2
+
+  cc_regular_count:
+    type: number
+    default: 2
+
+  ns_count:
+    type: number
+    default: 1
+
+  # Roles or types of instances
+  kafka_role:
+    type: string
+    default: kafka
+
+  zk_role:
+    type: string
+    default: zookeeper
+
+  cc_role:
+    type: string
+    default: cassandra
+
+  cc_seed_node_type:
+    type: string
+    default: seed
+
+  cc_regular_node_type:
+    type: string
+    default: regular
+
+  ns_role:
+    type: string
+    default: ns
+
+  # Host (instance) names
+  # Create an unique name for each server using its index in the group
+  cc_hostname:
+    type: string
+    default: dk-ccdc1-%index%
+
+  kafka_hostname:
+    type: string
+    default: dk-kafka-%index%
+
+  zk_hostname:
+    type: string
+    default: dk-zookeeper-%index%
+
+  ns_hostname:
+    type: string
+    default: dk-ns-%index%
+
+  broker_id:
+    type: string
+    default: 1
+
+  # Available Networks
+  private_network:
+    type: string
+    default: ns-poc-network
+    description: Id or name of the private network for the compute server
+
+  private_subnet:
+    type: string
+    default: ns-poc-subnet
+    description: Id or name of the private sub network for the compute server
+
+  public_network:
+    type: string
+    default: public
+    description: Id or name of the public network for the compute server
+
+  # Security Group(s)
+  secgroup:
+     type: string
+     description: security group for the instance to use
+     default: NS
+
+resources:
+
+  kafka_cluster:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: kafka_count }
+      resource_def:
+        type: kafka_zookeeper_instance.yaml
+        properties:
+          hostname: { get_param: kafka_hostname }
+          image: { get_param: kz_image }
+          role: { get_param: kafka_role }
+          brokerid: { get_param: broker_id }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          secgroup: { get_param: secgroup }
+          stack_name: { get_param: stack_name }
+
+  zookeeper_cluster:
+    type: OS::Heat::ResourceGroup
+    properties:
+       count: { get_param: zookeeper_count }
+       resource_def:
+         type: kafka_zookeeper_instance.yaml
+         properties:
+           hostname: { get_param: zookeeper_hostname }
+           image: { get_param: kz_image }
+           role: { get_param: zookeeper_role }
+           private_network: { get_param: private_network }
+           private_subnet: { get_param: private_subnet }
+           public_network: { get_param: public_network }
+           secgroup: { get_param: secgroup }
+           stack_name: { get_param: stack_name }
+
+  cc_cluster_seed:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: cc_seed_count }  # The number of seed nodes
+      resource_def:
+        type: cassandra-template.yaml
+        properties:
+          hostname: { get_param: cc_hostname }
+          image: { get_param: cc_image }
+          role: { get_param: cc_role }
+          node_type: { get_param: cc_seed_node_type }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          secgroup: { get_param: secgroup }
+          stack_name: { get_param: stack_name }
+
+  cc_cluster_regular:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: cc_regular_count }   # The number of regular nodes
+      resource_def:
+        type: cassandra-template.yaml
+        properties:
+          hostname: { get_param: cc_hostname } # hostname has an index in the name
+          image: { get_param: cc_image }
+          role: { get_param: cc_role }
+          node_type: { get_param: cc_regular_node_type }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          secgroup: { get_param: secgroup }
+          stack_name: { get_param: stack_name }
+
+  ns_instance:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: { get_param: ns_count }
+      resource_def:
+        type: ns_template.yaml
+        properties:
+          image: { get_param: ns_image }
+          hostname: { get_param: ns_hostname }
+          private_network: { get_param: private_network }
+          private_subnet: { get_param: private_subnet }
+          public_network: { get_param: public_network }
+          secgroup: { get_param: secgroup }
+          role: { get_param: ns_role }
+          stack_name: { get_param: stack_name }
