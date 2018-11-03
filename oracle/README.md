@@ -5,8 +5,8 @@ AS-TRANS - Oracle SQL statement Transcriber
 -------------------------------------------
 
 Transform Oracle SQL statements to unified and well-documented format:
-* [picture 1](as_trans/as_trans_picture_01.png)
-* [picture 2](as_trans/as_trans_picture_02.png)
+* [picture 1](as_trans/as_trans_picture_01.png) and [example_1](as_trans/as_trans_example_01.txt) 
+* [picture 2](as_trans/as_trans_picture_02.png) and [example_2](as_trans/as_trans_example_02.txt) 
 
 The new SQL statement has: 
 * description of all system tables and views in the statement
