@@ -6,3 +6,7 @@
 * Distributed tables in [GreenPlum](greenplum/README.md) Database
 * SaltStack configuration of the [Cassandra](cassandra/README.md) Database, Use Cases 
 * SaltStack configuration of [MongoDB](mongoDB/README.md)
+
+## License
+
+This code is released under the MIT License. See LICENSE.txt.
