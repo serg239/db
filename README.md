@@ -9,4 +9,4 @@
 
 ## License
 
-This code is released under the MIT License. See LICENSE.md.
+This code is released under the MIT License. See LICENSE.txt.
